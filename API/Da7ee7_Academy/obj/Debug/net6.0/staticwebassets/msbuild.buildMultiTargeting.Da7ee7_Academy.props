@@ -1,0 +1,3 @@
+﻿<Project>
+  <Import Project="..\build\Da7ee7_Academy.props" />
+</Project>
