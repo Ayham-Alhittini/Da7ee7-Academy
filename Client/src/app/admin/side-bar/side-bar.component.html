@@ -1,0 +1,57 @@
+<div class="sidebar">
+<div class="logo-details">
+    <i class="fa-solid fa-at"></i>
+    <span class="logo_name">Da7ee7 Acad...</span>
+</div>
+    <ul class="nav-links">
+        <li>
+            <a routerLink="dashboard" routerLinkActive="active">
+                <i class='bx bx-grid-alt' ></i>
+                <span class="links_name">Dashboard</span>
+            </a>
+        </li>
+        <li>
+            <a routerLinkActive="active" routerLink="/admin/moderators">
+                <i class="fa-solid fa-user-gear"></i>
+                <span class="links_name">Moderators</span>
+            </a>
+        </li>
+        <li>
+            <a routerLinkActive="active" routerLink="/admin/teachers">
+                <i class="fa-solid fa-chalkboard-user"></i>
+                <span class="links_name">Teachers</span>
+            </a>
+        </li>
+        <li>
+            <a routerLinkActive="active" routerLink="/admin/students">
+                <i class="fa-solid fa-user-graduate"></i>
+                <span class="links_name">Students</span>
+            </a>
+        </li>
+        <li>
+            <a routerLinkActive="active" routerLink="/admin/courses">
+                <i class="fa-solid fa-desktop"></i>
+                <span class="links_name">Courses</span>
+            </a>
+        </li>
+        <li>
+            <a routerLinkActive="active" routerLink="/admin/blogs">
+                <i class="fa-solid fa-blog"></i>
+                <span class="links_name">Blogs</span>
+            </a>
+        </li>
+        <li>
+            <a routerLinkActive="active" routerLink="/admin/sale-points">
+                <i class="fa-solid fa-location-dot"></i>
+                <span class="links_name">Sale points</span>
+            </a>
+        </li>
+        <li class="log_out" style="cursor: pointer;" (click)="accountService.logout()">
+            <a>
+                <i class='bx bx-log-out'></i>
+                <span class="links_name">Log out</span>
+            </a>
+        </li>
+    </ul>
+</div>
+

@@ -18,6 +18,7 @@ namespace Da7ee7_Academy.Data
         public DbSet<Blog> Blogs { get; set; }
         public DbSet<SalePoint> SalePoints { get; set; }
         public DbSet<AppFile> Files { get; set; }
+        public DbSet<WatchedLecture> WatchedLectures { get; set; }
 
         protected override void OnModelCreating(ModelBuilder builder)
         {
@@ -25,6 +26,19 @@ namespace Da7ee7_Academy.Data
 
             builder.Entity<Student_Course>()
                 .HasKey(s => new {s.StudentId, s.CourseId});
+
+            builder.Entity<WatchedLecture>()
+                .HasKey(wl => new {wl.StudentId, wl.SectionItemId});
+
+            builder.Entity<WatchedLecture>()
+                .HasOne(wl => wl.SectionItem)
+                .WithMany(si => si.WatchedLectures)
+                .OnDelete(DeleteBehavior.NoAction);
+
+            builder.Entity<SectionItem>()
+                .HasOne(si => si.Course)
+                .WithMany(c => c.SectionItems)
+                .OnDelete(DeleteBehavior.NoAction);
         }
     }
 }

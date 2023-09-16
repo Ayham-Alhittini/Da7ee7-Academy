@@ -1,0 +1,18 @@
+/* You can add global styles to this file, and also import other style files */
+/* Apply the specified fonts to the body element */
+
+* {
+    margin: 0;
+    padding: 0;
+}
+body {
+    text-align: right;
+    direction: rtl;
+    unicode-bidi: bidi-override;
+    font-family: 'Noto Naskh Arabic', sans-serif;
+    background-color: #fff;
+}
+.da-en {
+    text-align: left;
+    direction: ltr;
+}

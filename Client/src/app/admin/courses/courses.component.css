@@ -1,0 +1,25 @@
+main {
+    height: 90vh;
+}
+table {
+    width: 100%;
+    border-collapse: collapse;
+    overflow-y: scroll;
+    color: #fff;
+    background-color: #0d3073;
+    border: 1px solid #000;
+    font-size: 19px;  
+}
+td {
+    padding: 20px;
+}
+tbody tr:hover{
+    color: red;
+}
+.add-course-btn {
+    padding: 15px;
+    border-radius: 50%;
+    position: absolute;
+    right: 30px;
+    bottom: 50px;
+}

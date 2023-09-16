@@ -30,6 +30,13 @@ namespace Da7ee7_Academy.Controllers
             _context = context;
         }
 
+        [Authorize]
+        [HttpGet("who-am-i")]
+        public ActionResult WhoAmI()
+        {
+            return Ok(_context.Users.Find(User.GetUserId()).FirstName);
+        }
+
         [Authorize(Roles = "Admin")]
         [HttpPost("teacher-register")]
         public async Task<ResponseModel> TeacherRegister(TeacherRegisterDto teacherRegister)
@@ -45,12 +52,12 @@ namespace Da7ee7_Academy.Controllers
 
             var FullNameParts = teacherRegister.FullName.Split(' ');
 
-            if (FullNameParts.Length < 4)
-            {
-                response.StatusCode = 400;
-                response.Errors.Add("Full name at least have 4 name");
-                return response;
-            }
+            //if (FullNameParts.Length < 4)
+            //{
+            //    response.StatusCode = 400;
+            //    response.Errors.Add("Full name at least have 4 name");
+            //    return response;
+            //}
 
             ///adding user
             var user = new AppUser
@@ -106,25 +113,15 @@ namespace Da7ee7_Academy.Controllers
 
         [AllowAnonymous]
         [HttpPost("student-register")]
-        public async Task<ResponseModel> StudentRegister([FromForm]StudentRegisterDto registerStudent)
+        public async Task<ActionResult> StudentRegister(StudentRegisterDto registerStudent)
         {
-            var response = new ResponseModel();
 
             if (await UserExist(registerStudent.FullName, registerStudent.Email, registerStudent.PhoneNumber))
             {
-                response.StatusCode = 400;
-                response.Errors.Add("Student exist");
-                return response;
+                return BadRequest("Student exist");
             }
 
             var FullNameParts = registerStudent.FullName.Split(' ');
-
-            if (FullNameParts.Length < 4)
-            {
-                response.StatusCode = 400;
-                response.Errors.Add("Full name at least have 4 name");
-                return response;
-            }
 
             ///adding user
             var user = new AppUser
@@ -138,37 +135,31 @@ namespace Da7ee7_Academy.Controllers
             };
 
             ///store the photo if any
-            var photo = registerStudent.UserImage;
-            if (CheckPhotoSended(photo))
-            {
-                var file = await SavePhoto(photo);
-                user.FileId = file.Id;
-                user.UserPhotoUrl = GetUrlRoot() + Url.Action("GetImages", "Files", new { photoId = file.Id });
-            }
+            //var photo = registerStudent.UserImage;
+            //if (CheckPhotoSended(photo))
+            //{
+            //    var file = await SavePhoto(photo);
+            //    user.FileId = file.Id;
+            //    user.UserPhotoUrl = GetUrlRoot() + Url.Action("GetImages", "Files", new { photoId = file.Id });
+            //}
 
             var result = await _userManager.CreateAsync(user, registerStudent.Password);
 
             if (!result.Succeeded)
             {
-                response.StatusCode = 400;
-                response.Errors.AddRange(result.Errors.Select(e => e.Description));
-                return response;
+                return BadRequest(result.Errors.Select(e => e.Description));
             }
 
             var roleResult = await _userManager.AddToRoleAsync(user, RolesSrc.Student);
             if (!roleResult.Succeeded)
             {
-                response.StatusCode = 400;
-                response.Errors.AddRange(result.Errors.Select(e => e.Description));
-                return response;
+                return BadRequest(result.Errors.Select(e => e.Description));
             }
 
             ///add the student entity as well
             var student = new Student
             {
-                Id = user.Id,
-                Major = registerStudent.Major,
-                Gender = registerStudent.Gender,
+                Id = user.Id
             };
 
             _context.Students.Add(student);
@@ -181,9 +172,7 @@ namespace Da7ee7_Academy.Controllers
             var message = new EmailMessage(new string[] { user.Email! }, "Confirmation email link", GetUrlRoot() + confirmationLink!);///need to be edited to take us to front end page
             _emailService.SendEmail(message);
 
-            response.IsSuccess = true;
-            response.Message = "An email have been send to your account check you email";
-            return response;
+            return Ok();
         }
 
         [Authorize]
@@ -273,45 +262,36 @@ namespace Da7ee7_Academy.Controllers
 
         [AllowAnonymous]
         [HttpPost("login")]
-        public async Task<ResponseModel<UserDto>> Login(LoginDto loginDto)
+        public async Task<ActionResult> Login(LoginDto loginDto)
         {
-            var response = new ResponseModel<UserDto>();
-            var user = await _userManager.FindByEmailAsync(loginDto.Email);
+            var user = await _userManager.Users
+                .FirstOrDefaultAsync(user => user.Email == loginDto.LoginProvider || user.PhoneNumber == loginDto.LoginProvider);
 
             if (user == null)
             {
-                response.StatusCode = 401;
-                response.Errors.Add("Invalid email");
-                return response;
+                return Unauthorized("Invalid login provider");
             }
 
             if (!user.EmailConfirmed)
             {
-                response.StatusCode = 401;
-                response.Errors.Add("You must confirm you email to log in");
-                return response;
+                return Unauthorized("You must confirm you email to log in");
             }
 
             var result = await _userManager.CheckPasswordAsync(user, loginDto.Password);
 
             if (!result)
             {
-                response.StatusCode = 401;
-                response.Errors.Add("Invalid password");
-                return response;
+                return Unauthorized("Invalid password");
             }
 
             UserDto userDto = new UserDto
             {
                 UserId = user.Id,
+                FirstName = user.FirstName,
                 Token = await _tokenService.CreateToken(user)
             };
 
-            response.IsSuccess = true;
-            response.Message = "Login successfuly";
-            response.Result = userDto;
-
-            return response;
+            return Ok(userDto);
         }
 
         [AllowAnonymous]

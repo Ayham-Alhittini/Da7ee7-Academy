@@ -248,6 +248,9 @@ namespace Da7ee7_Academy.Migrations
                     b.Property<string>("ContentUrl")
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<int>("CourseId")
+                        .HasColumnType("int");
+
                     b.Property<string>("FileId")
                         .HasColumnType("nvarchar(450)");
 
@@ -263,7 +266,12 @@ namespace Da7ee7_Academy.Migrations
                     b.Property<int>("Type")
                         .HasColumnType("int");
 
+                    b.Property<int>("VideoLength")
+                        .HasColumnType("int");
+
                     b.HasKey("Id");
+
+                    b.HasIndex("CourseId");
 
                     b.HasIndex("FileId");
 
@@ -320,6 +328,29 @@ namespace Da7ee7_Academy.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Teachers");
+                });
+
+            modelBuilder.Entity("Da7ee7_Academy.Entities.WatchedLecture", b =>
+                {
+                    b.Property<string>("StudentId")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<int>("SectionItemId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("CourseId")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("WatchedDate")
+                        .HasColumnType("datetime2");
+
+                    b.HasKey("StudentId", "SectionItemId");
+
+                    b.HasIndex("CourseId");
+
+                    b.HasIndex("SectionItemId");
+
+                    b.ToTable("WatchedLectures");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRole", b =>
@@ -501,6 +532,12 @@ namespace Da7ee7_Academy.Migrations
 
             modelBuilder.Entity("Da7ee7_Academy.Entities.SectionItem", b =>
                 {
+                    b.HasOne("Da7ee7_Academy.Entities.Course", "Course")
+                        .WithMany("SectionItems")
+                        .HasForeignKey("CourseId")
+                        .OnDelete(DeleteBehavior.NoAction)
+                        .IsRequired();
+
                     b.HasOne("Da7ee7_Academy.Entities.AppFile", "File")
                         .WithMany()
                         .HasForeignKey("FileId");
@@ -510,6 +547,8 @@ namespace Da7ee7_Academy.Migrations
                         .HasForeignKey("SectionId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+
+                    b.Navigation("Course");
 
                     b.Navigation("File");
 
@@ -555,6 +594,33 @@ namespace Da7ee7_Academy.Migrations
                         .IsRequired();
 
                     b.Navigation("AppUser");
+                });
+
+            modelBuilder.Entity("Da7ee7_Academy.Entities.WatchedLecture", b =>
+                {
+                    b.HasOne("Da7ee7_Academy.Entities.Course", "Course")
+                        .WithMany("WatchedLectures")
+                        .HasForeignKey("CourseId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Da7ee7_Academy.Entities.SectionItem", "SectionItem")
+                        .WithMany("WatchedLectures")
+                        .HasForeignKey("SectionItemId")
+                        .OnDelete(DeleteBehavior.NoAction)
+                        .IsRequired();
+
+                    b.HasOne("Da7ee7_Academy.Entities.Student", "Student")
+                        .WithMany("WatchedLectures")
+                        .HasForeignKey("StudentId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Course");
+
+                    b.Navigation("SectionItem");
+
+                    b.Navigation("Student");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
@@ -612,7 +678,11 @@ namespace Da7ee7_Academy.Migrations
                 {
                     b.Navigation("EnrolledStudents");
 
+                    b.Navigation("SectionItems");
+
                     b.Navigation("Sections");
+
+                    b.Navigation("WatchedLectures");
                 });
 
             modelBuilder.Entity("Da7ee7_Academy.Entities.Section", b =>
@@ -620,9 +690,16 @@ namespace Da7ee7_Academy.Migrations
                     b.Navigation("SectionItems");
                 });
 
+            modelBuilder.Entity("Da7ee7_Academy.Entities.SectionItem", b =>
+                {
+                    b.Navigation("WatchedLectures");
+                });
+
             modelBuilder.Entity("Da7ee7_Academy.Entities.Student", b =>
                 {
                     b.Navigation("Courses");
+
+                    b.Navigation("WatchedLectures");
                 });
 
             modelBuilder.Entity("Da7ee7_Academy.Entities.Teacher", b =>

@@ -1,0 +1,60 @@
+<div class="navbar-alert alert-danger">
+    <span class="alert-message">عاجل : 3 مواد علمي بـ 100د / 3 مواد ادبي بـ 75د</span>
+</div>
+<nav class="navbar navbar-expand-lg navbar-light bg-light">
+    <div class="container">
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      
+      <a href="#" routerLink="/" class="navbar-brand mx-0 nuxt-link-exact-active nuxt-link-active">
+        <span class="ms-1">Da7ee7 Academy</span>
+        <i class="fa-solid fa-graduation-cap"></i>
+      </a>
+
+      <div class="collapse navbar-collapse justify-content-start" id="navbarSupportedContent">
+        <ul class="navbar-nav me-3 mb-lg-0">
+          <li class="nav-item me-4">
+            <a class="nav-link router" (click)="activePage = pages[0]" [class.active-page]="activePage === pages[0]" aria-current="page">الرئسية</a>
+          </li>
+          <li class="nav-item me-4">
+            <a class="nav-link router" (click)="activePage = pages[1]" [class.active-page]="activePage === pages[1]" aria-current="page">الدورات</a>
+          </li>
+          <li class="nav-item me-4">
+            <a class="nav-link router" (click)="activePage = pages[2]" [class.active-page]="activePage === pages[2]" aria-current="page">المعلمون</a>
+          </li>
+          <li class="nav-item me-4">
+            <a class="nav-link router" (click)="activePage = pages[3]" [class.active-page]="activePage === pages[3]" aria-current="page">المدونات</a>
+          </li>
+          <li class="nav-item me-4">
+            <a class="nav-link router" (click)="activePage = pages[4]" [class.active-page]="activePage === pages[4]" aria-current="page">نقاط البيع</a>
+          </li>
+        </ul>
+      </div>
+      
+      <ul class="navbar-nav me-auto mb-lg-0 d-flex align-items-center" *ngIf="(accountService.loadedUser | async)">
+        <li class="nav-item">
+          <a href="#" class="nav-link main-nav-link btn btn-info font-weight-bolder border-0 student-courses" routerLink="/course/1">دوراتي</a>
+        </li>
+        <li class="nav-item dropdown me-3">
+          <a class="nav-link dropdown-toggle router" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+            <img src="./assets/user.png" alt="user photo" class="myImage me-2">
+            <span class="me-2">{{(accountService.loadedUser | async)?.firstName}}</span>
+          </a>
+          <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
+            <li><a class="dropdown-item" href="#"><i class="fa-solid fa-gear"></i><span class="me-2">الاعدادت</span></a></li>
+            <li><a class="dropdown-item" href="#" (click)="accountService.logout()"><i class="fa-solid fa-right-from-bracket"></i><span class="me-2">تسجيل الخروج</span></a></li>
+          </ul>
+        </li>
+      </ul>
+      <ul class="navbar-nav me-auto mb-lg-0" *ngIf="!(accountService.loadedUser | async)">
+        <li class="nav-item dropdown">
+          <button class="btn nav-link btn-da-orange" routerLink="/singup">إنشاء حساب</button>
+        </li>
+        <li class="nav-item">
+          <button class="btn nav-link btn-da-outline me-2" routerLink="/login">تسجيل الدخول</button>
+        </li>
+      </ul>
+
+    </div>
+  </nav>

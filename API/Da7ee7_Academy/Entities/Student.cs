@@ -12,5 +12,6 @@ namespace Da7ee7_Academy.Entities
         public string Gender { get; set; }
         public string Address { get; set; }
         public List<Student_Course> Courses { get; set; }
+        public List<WatchedLecture> WatchedLectures { get; set; }
     }
 }

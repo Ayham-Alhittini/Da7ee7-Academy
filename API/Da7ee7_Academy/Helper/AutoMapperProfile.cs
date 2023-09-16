@@ -1,4 +1,6 @@
 ﻿using AutoMapper;
+using Da7ee7_Academy.DTOs;
+using Da7ee7_Academy.Entities;
 
 namespace Da7ee7_Academy.Helper
 {
@@ -6,7 +8,9 @@ namespace Da7ee7_Academy.Helper
     {
         public AutoMapperProfile()
         {
-
+            CreateMap<Course, CourseDto>();
+            CreateMap<Section, SectionDto>();
+            CreateMap<SectionItem, SectionItemDto>();
         }
     }
 }

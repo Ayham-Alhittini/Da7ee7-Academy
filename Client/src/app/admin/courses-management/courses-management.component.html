@@ -1,0 +1,25 @@
+<div class="da-en" style="height: 100vh;">
+    <nav class="navbar navbar-expand-lg" style="background-color: #0A2558;">
+        <div class="container">
+          <a class="navbar-brand text-light" routerLink="/admin">Da7ee7 Academy</a>
+        </div>
+    </nav>
+
+    <div class="management-container">
+        <h2 class="management-title">Course #{{courseId}}</h2>
+
+        <form class="input-container" (ngSubmit)="newSection()" autocomplete="off">
+            <input placeholder="Section Title" type="text" name="sectionTitle" [(ngModel)]="_newSection">
+            <button class="button" type="submit">Add</button>
+        </form>
+          
+        <ul class="list-group">
+            <li class="list-group-item" 
+            *ngFor="let section of sections"
+            routerLink="{{'/courses-management/section/' + section.id}}"
+            >
+                {{section.sectionTitle}}
+            </li>
+        </ul>
+    </div>
+</div>

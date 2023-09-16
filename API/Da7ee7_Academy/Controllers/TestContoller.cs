@@ -1,10 +1,7 @@
 ﻿using Da7ee7_Academy.Data;
-using Da7ee7_Academy.Entities;
-using Da7ee7_Academy.Enums;
-using Da7ee7_Academy.Helper;
+using Da7ee7_Academy.Extensions;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Hosting;
-
 namespace Da7ee7_Academy.Controllers
 {
     public class TestContoller: BaseApiController
@@ -16,10 +13,12 @@ namespace Da7ee7_Academy.Controllers
         }
 
         [HttpGet]
-        public IActionResult Test()
+        public IActionResult Test(int courseId)
         {
-            string referrer = Request.Headers["Referer"].ToString();
-            return Ok(referrer);
+            Dictionary<int, bool> watched = new Dictionary<int, bool> { { 1, true }, { 2, true }, { 3, true } };
+
+
+            return Ok(watched.ContainsKey(courseId));
         }
     }
 }

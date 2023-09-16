@@ -1,14 +1,4 @@
-*if student order more than one course they should on one package
-no need to send each one sepratly so we do need another tabel called orders and the realtionship between
-it and the student is many to many
-
 *dont forget to add the validation to allow only the student who buy the course to reach for it
-
-
-
-
-***TO DO***
-1- find more about video player 
-2- start with angular application
-3- the most important part of the appication the ablitiy to show the lectures and files and manage them 
-	so focus on that
+*about the الفصل
+*about file name for pdf files
+*when delete section or section items all the sibling entity should update the order number

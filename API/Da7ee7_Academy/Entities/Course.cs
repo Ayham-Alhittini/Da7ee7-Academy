@@ -12,5 +12,10 @@
         public AppFile File { get; set; }
         public List<Student_Course> EnrolledStudents { get; set; }
         public List<Section> Sections { get; set; }
+        public List<SectionItem> SectionItems { get; set; }/// <summary>
+        /// will be used only to access the courseId from sectionItem 
+        /// instead of fetch the section then get the course id 
+        /// </summary>
+        public List<WatchedLecture> WatchedLectures { get; set; }
     }
 }

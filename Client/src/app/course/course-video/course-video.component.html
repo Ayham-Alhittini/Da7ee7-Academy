@@ -1,0 +1,37 @@
+<div class="da-en">
+    <div style="width: 100%;" *ngIf="src" lang="en">
+        <vg-player 
+        keyboardEvents="space, enter, m"
+            (onPlayerReady)="onPlayerReady($event)">
+             <vg-overlay-play></vg-overlay-play>
+            <vg-buffering vgFor="singleVideo"></vg-buffering>
+            <vg-scrub-bar>
+                <vg-scrub-bar-current-time></vg-scrub-bar-current-time>
+                <vg-scrub-bar-buffering-time></vg-scrub-bar-buffering-time>
+            </vg-scrub-bar> 
+            <vg-controls>
+                <vg-play-pause></vg-play-pause>
+                <vg-playback-button></vg-playback-button>
+                <vg-time-display vgProperty="current" vgFormat="mm:ss"></vg-time-display>
+                <vg-scrub-bar style="pointer-events: none;"></vg-scrub-bar>
+                <vg-time-display vgProperty="left" vgFormat="mm:ss"></vg-time-display>
+                <vg-time-display vgProperty="total" vgFormat="mm:ss"></vg-time-display>
+                <vg-mute></vg-mute>
+                <vg-volume></vg-volume>
+                <vg-fullscreen #fullScreen></vg-fullscreen>
+            </vg-controls>
+            <video [vgMedia]="$any(media)" 
+                    #media id="singleVideo" 
+                    preload="true" 
+                    src="{{src}}" 
+                    crossorigin>
+            </video>
+        </vg-player>
+    </div>
+    <div *ngIf="src === null" style="height: 513px;width: 100%;" class="d-flex justify-content-center align-items-center">
+        <div class="text-center">
+            <strong style="font-size: 35px;">اهلا بك في الدورة</strong>
+            <p class="lead text-primary">اختر فيديو حتى تبدأ</p>
+        </div>
+    </div>
+</div>

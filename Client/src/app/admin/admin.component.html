@@ -1,0 +1,19 @@
+<div class="da-en">
+    <app-side-bar></app-side-bar>
+    <section class="home-section">
+        <nav>
+            <div class="sidebar-button">
+            <span class="dashboard">{{activeChild}}</span>
+            </div>
+            <div class="search-box">
+            <input type="text" placeholder="Search...">
+            <i class='bx bx-search' ></i>
+            </div>
+        </nav>
+        
+        <div class="home-content">
+            <router-outlet></router-outlet>
+        </div>
+    </section>
+    <hr>
+</div>

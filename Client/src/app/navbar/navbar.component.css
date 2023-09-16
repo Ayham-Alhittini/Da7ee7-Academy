@@ -1,0 +1,54 @@
+.navbar-da {
+    background-color: #fff;
+    font-weight: 600;
+}
+.dropdown-menu .dropdown-item {
+    text-align: right;
+    color: rgb(0, 98, 179);
+}
+.navbar-nav .nav-link {
+    color: #214faa;
+    font-size: 18px;
+    cursor: pointer;
+}
+.navbar-nav .nav-link.router:hover, .active-page {
+    color: #fb513e;
+    padding-bottom: 5px;
+    border-bottom: 3px solid #fb513e;
+}
+
+.navbar-alert {
+    width: 100%;
+    padding: 15px;
+    background-color: #fc575e;
+    text-align: center;
+}
+.alert-danger {
+    background-color: #e3342f;
+    color: #fff;
+}
+
+.btn-da-orange {
+    color: #fff!important;
+    border: 2px solid #fb513e;
+    background: #fb513e 0 0 no-repeat padding-box;
+    border-radius: 10px;
+}
+.btn-da-outline:hover {
+    background-color: #023373;
+    color: #fff!important;
+}
+.btn-da-outline {
+    background-color: transparent;
+    border: 2px solid #023373;
+    color: #023373!important;
+    border-radius: 10px;
+}
+.myImage {
+    max-height: 40px;
+    display: inline;
+    border-radius: 50%;
+}
+.student-courses {
+    color:#FFFFFF !important;background-color:rgb(21 39 132 / 80%);
+}

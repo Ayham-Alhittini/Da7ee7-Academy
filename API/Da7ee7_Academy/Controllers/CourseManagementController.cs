@@ -1,8 +1,8 @@
-﻿using Da7ee7_Academy.Data;
+﻿using AutoMapper;
+using AutoMapper.QueryableExtensions;
+using Da7ee7_Academy.Data;
 using Da7ee7_Academy.DTOs;
 using Da7ee7_Academy.Entities;
-using Da7ee7_Academy.Enums;
-using Da7ee7_Academy.Helper;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -13,16 +13,33 @@ namespace Da7ee7_Academy.Controllers
     public class CourseManagementController: BaseApiController
     {
         private readonly DataContext _context;
+        private readonly IMapper _mapper;
         private readonly IWebHostEnvironment _env;
-        public CourseManagementController(DataContext context, IWebHostEnvironment env)
+        public CourseManagementController(DataContext context,
+            IWebHostEnvironment env, 
+            IMapper mapper)
         {
             _context = context;
             _env = env;
+            _mapper = mapper;
         }
 
         [HttpPost("add-course")]
-        public ResponseModel AddCourse([FromForm] AddCourseDto courseDto)
+        public ActionResult AddCourse([FromForm]AddCourseDto courseDto)
         {
+            ///the course with same major and same subject and same teacher should be rejected
+            ///
+
+            if (CheckCourseExist(courseDto))
+            {
+                return BadRequest("Course already exist");
+            }
+            ///check the course cover
+            if (!courseDto.CourseCover.ContentType.Contains("image"))
+            {
+                return BadRequest("only accept images for course cover");
+            }
+
             var course = new Course
             {
                 Subject = courseDto.Subject,
@@ -47,20 +64,17 @@ namespace Da7ee7_Academy.Controllers
 
             _context.SaveChanges(); ///for saving FileId and CoursePhotoUrl
 
-            return new ResponseModel { IsSuccess = true, Message = "Course added successfuly"};
+            return Ok();
         }
 
         [HttpDelete("delete-course/{courseId}")]
-        public ResponseModel DeleteCourse(int courseId)
+        public ActionResult DeleteCourse(int courseId)
         {
-            var response = new ResponseModel();
             var course = _context.Courses.Find(courseId);
 
             if (course == null)
             {
-                response.StatusCode = 404;
-                response.Errors.Add("Course not found");
-                return response;
+                return NotFound("Course not found");
             }
 
             _context.Courses.Remove(course);//delete course from DB
@@ -74,27 +88,18 @@ namespace Da7ee7_Academy.Controllers
             // Delete the folder and its contents recursively.
             Directory.Delete(courseFolder, recursive: true);
 
-            response.IsSuccess = true;
-            response.Message = "Course deleted successfuly";
-
-            return response;
+            return Ok();
         }
 
-
-
         [HttpPost("add-course-section")]
-        public ResponseModel AddCourseSection(AddCourseSectionDto sectionDto)
+        public ActionResult AddCourseSection(AddCourseSectionDto sectionDto)
         {
-            var response = new ResponseModel();
-
             var course = _context.Courses.Include(course => course.Sections)
                 .FirstOrDefault(course => course.Id == sectionDto.CourseId);
 
             if (course == null)
             {
-                response.StatusCode = 404;
-                response.Errors.Add("Course not found");
-                return response;
+                return Ok("Course not found");
             }
 
             var section = new Section
@@ -113,29 +118,25 @@ namespace Da7ee7_Academy.Controllers
             var folderPath = Path.Combine(Directory.GetCurrentDirectory(), path);
             Directory.CreateDirectory(folderPath);
 
-            response.IsSuccess = true;
-            response.Message = "Section added successfuly";
-
-            return response;
+            return Ok();
         }
 
         [HttpDelete("delete-course-section/{sectionId}")]///add section items first to test it better
-        public ResponseModel DeleteCourseSection(int sectionId)
+        public ActionResult DeleteCourseSection(int sectionId)
         {
-            var response = new ResponseModel();
-
-            var section = _context.Sections.Include(s => s.SectionItems)
-                .ThenInclude(si => si.File)
-                .FirstOrDefault(s => s.Id == sectionId);
+            var section = _context.Sections
+                .Include(section => section.SectionItems)
+                .ThenInclude(sectionItems => sectionItems.File)
+                .FirstOrDefault(section => section.Id == sectionId);
 
             if (section == null)
             {
-                response.StatusCode = 404;
-                response.Errors.Add("Section not found");
-
-                return response;
+                return NotFound("Section not found");
             }
-
+            var course = _context.Courses
+                .Where(course => course.Id == section.CourseId)
+                .Include(course => course.Sections.OrderBy(s => s.OrderNumber))
+                .FirstOrDefault();
 
             /*
              Need to delete
@@ -155,63 +156,52 @@ namespace Da7ee7_Academy.Controllers
             var path = $@"Uploads\Courses\Course#{section.CourseId}\Section#{section.Id}";
             var fullPath = Path.Combine(Directory.GetCurrentDirectory(), path);
             Directory.Delete(fullPath, true);
-            
+
+
+            ///update order number for other sections
+            int newOrderNumber = section.OrderNumber;
+
+            for (int i = section.OrderNumber; i < course.Sections.Count; i++, newOrderNumber++)
+            {
+                course.Sections[i].OrderNumber = newOrderNumber;
+            }
+
             _context.SaveChanges();
 
-            response.IsSuccess = true;
-            response.Message = "Course section deleted successfuly";
-
-            return response;
+            return Ok();
         }
 
 
 
         [HttpPost("add-section-item")]
-        public ResponseModel AddSectionItem([FromForm] AddSectionItemDto sectionItemDto)
+        [RequestSizeLimit(1000 * 1024 * 1024)]///MAX SIZE 1 GB
+        public ActionResult AddSectionItem([FromForm] AddSectionItemDto sectionItemDto)
         {
-            var response = new ResponseModel();
 
             var section = _context.Sections.Include(section => section.SectionItems)
                 .FirstOrDefault(section => section.Id == sectionItemDto.SectionId);
 
             if (section == null)
             {
-                response.StatusCode = 404;
-                response.Errors.Add("Section not found");
-
-                return response;
+                return NotFound("Section not found");
             }
 
             //check the type
-            int type = sectionItemDto.Type;
             string fileExtension = Path.GetExtension(sectionItemDto.File.FileName).ToLower();
-
-            if (type == (int)SectionItemType.Attachment)
+            int type = -1;
+            if (fileExtension != ".pdf" && fileExtension != ".mp4")
             {
-                if (fileExtension != ".pdf")
-                {
-                    response.StatusCode = 400;
-                    response.Errors.Add("Only accept pdf for attachments");
-
-                    return response;
-                }
-            }
-            else if (type == (int)SectionItemType.Lecture)
-            {
-                if (fileExtension != ".mp4")
-                {
-                    response.StatusCode = 400;
-                    response.Errors.Add("only accept mp4 for lectures");
-
-                    return response;
-                }
+                return BadRequest("Unexpcted type only accept mp4 files for video and pdf for attachments");
             }
             else
             {
-                response.StatusCode = 400;
-                response.Errors.Add("Unexpected type, expect 1 as attachment and 2 as lecture");
-
-                return response;
+                switch(fileExtension)
+                {
+                    case ".pdf": type = 1; sectionItemDto.VideoLength = 0;
+                        break;
+                    case ".mp4": type= 2; 
+                        break;
+                }
             }
 
             //create the section item
@@ -219,9 +209,13 @@ namespace Da7ee7_Academy.Controllers
             {
                 SectionItemTitle = sectionItemDto.SectionItemTitle,
                 OrderNumber = section.SectionItems.Count() + 1,
-                Type = sectionItemDto.Type,
+                Type = type,
                 SectionId = sectionItemDto.SectionId,
+                CourseId = section.CourseId,
+                VideoLength = sectionItemDto.VideoLength,
             };
+
+            section.TotalSectionTime += sectionItem.VideoLength;
 
             ///add the file
             var file = SaveSectionItemFile(sectionItemDto.File, section);
@@ -236,26 +230,23 @@ namespace Da7ee7_Academy.Controllers
 
             _context.SaveChanges();
 
-            response.IsSuccess = true;
-            response.Message = "Section item added successfuly";
-
-            return response;
+            return Ok();
         }
 
         [HttpDelete("delete-section-item/{sectionItemId}")]
-        public ResponseModel DeleteSectionItem(int sectionItemId)
+        public ActionResult DeleteSectionItem(int sectionItemId)
         {
-            var response = new ResponseModel();
             var sectionItem = _context.SectionItems.Include(si => si.File)
                 .FirstOrDefault(si => si.Id == sectionItemId);
 
             if (sectionItem == null)
             {
-                response.StatusCode = 404;
-                response.Errors.Add("Section item not found");
-                
-                return response;
+                return NotFound("Section item not found");
             }
+            var section = _context.Sections
+                .Where(section => section.Id == sectionItem.SectionId)
+                .Include(si => si.SectionItems.OrderBy(si => si.OrderNumber))
+                .FirstOrDefault();
 
             //delete from DB
             _context.SectionItems.Remove(sectionItem);
@@ -267,18 +258,79 @@ namespace Da7ee7_Academy.Controllers
 
             System.IO.File.Delete(filePath);
 
+
+            ////update order number for section items
+            int newOrderNumber = sectionItem.OrderNumber;
+            for (int i = sectionItem.OrderNumber; i < section.SectionItems.Count; i++, newOrderNumber++)
+            {
+                section.SectionItems[i].OrderNumber = newOrderNumber;
+            }
+
+            ///subtract time from section time
+            section.TotalSectionTime -= sectionItem.VideoLength;
+
             ///save changes
             _context.SaveChanges();
 
-            response.IsSuccess = true;
-            response.Message = "Section item deleted successfuly";
-            
-            return response;
+            return Ok();
         }
+
+
+
+        ///end-points to get the data to about the course to manage it
         
-        
+        [HttpGet("get-course-sections/{courseId}")]
+        public ActionResult GetCourseSections(int courseId)
+        {
+            var course = _context.Courses.Find(courseId);
+
+            if (course == null)
+            {
+                return NotFound("Course not exist");
+            }    
+
+            var sections = _context.Sections
+                .Where(section => section.CourseId == courseId)
+                .Select(section => new
+                {
+                    section.Id,
+                    section.SectionTitle,
+                    section.OrderNumber
+                })
+                .OrderBy(section => section.OrderNumber)
+                .ToList();
+
+            return Ok(sections);
+        }
+
+
+        [HttpGet("get-course-section/{sectionId}")]
+        public ActionResult GetCourseSectoion(int sectionId)
+        {
+            var section = _context.Sections
+                .Where(section => section.Id == sectionId)
+                .ProjectTo<SectionDto>(_mapper.ConfigurationProvider)
+                .FirstOrDefault();
+
+            if (section == null)
+            {
+                return NotFound("Section not exist");
+            }
+
+            section.SectionItems = section.SectionItems.OrderBy(si => si.OrderNumber).ToList();
+
+            return Ok(section);
+        }
 
         ///Private Methods
+        
+        private bool CheckCourseExist(AddCourseDto courseDto)
+        {
+            return _context.Courses
+                .Any(course => course.TeacherId == courseDto.TeacherId
+                               && course.Major == courseDto.Major
+                               && course.Subject == courseDto.Subject);
+        }
         private AppFile SavePhoto(IFormFile photo, int courseId)
         {
             var file = new AppFile

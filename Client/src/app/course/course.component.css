@@ -1,0 +1,47 @@
+* {
+    margin: 0;
+    padding: 0;
+}
+.start-lecture {
+    background-color: #edf1fe;
+    border: 1px solid #edf1fe;
+    color: #3744ac;
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    margin-left: 5px;
+}
+.watched-lecture {
+    background-color: #ebfce8;
+    border: 1px solid #77ed61;
+    color: #77ed61;
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    margin-left: 5px;
+}
+.section-item {
+    display: flex;
+    padding: 10px;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 5px;
+    /* background-color: #d1d7dc;     */
+}
+
+.section-item:hover, .da-active{
+    cursor: pointer;
+    border-radius: 5px;
+    background-color: #d1d7dc;
+    transition: 0.3s;
+}
+
+.in-active {
+    color: lightgray;
+}

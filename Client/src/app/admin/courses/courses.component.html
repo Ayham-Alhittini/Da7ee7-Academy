@@ -1,0 +1,123 @@
+<ng-container *ngIf="!loading">
+  <main>
+    <ng-container *ngIf="courses.length > 0">
+      <div style="overflow-y: scroll; max-height: 70vh;">
+          <table class="table">
+              <thead>
+                <tr>
+                  <th scope="col">#</th>
+                  <th scope="col">Course cover picture</th>
+                  <th scope="col">Subject</th>
+                  <th scope="col">Major</th>
+                  <th scope="col">Teacher</th>
+                  <th scope="col">No. of students</th>
+                  <th scope="col">Total course time</th>
+                  <th scope="col"></th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr class="text-center align-items-center" *ngFor="let course of courses">
+                  <td>{{course.id}}</td>
+                  <td><img src="{{course.courseCover}}" style="max-height: 50px;" alt=""></td>
+                  <td>{{course.subject}}</td>
+                  <td>{{course.major}}</td>
+                  <td>{{course.teacher}}</td>
+                  <td>{{course.numberOfStudents}}</td>
+                  <td>{{getTime(course.totalCourseTime)}}</td>
+                  <td>
+                      <button class="btn btn-danger me-1" (click)="onDeleteClick(course.id)"><i class="fa-solid fa-trash"></i></button>
+                      <button class="btn btn-link bg-light" routerLink="{{'/courses-management/course/' + course.id}}"><i class="fa-solid fa-eye"></i></button>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+      </div>
+    </ng-container>
+    <ng-container *ngIf="courses.length === 0">
+      <p class="lead">No Courses Found</p>
+    </ng-container>
+    <button 
+        data-bs-toggle="modal" data-bs-target="#enroll"
+        title="add new course"
+        class="btn btn-success add-course-btn">
+        <i class="fa-solid fa-plus"></i>
+    </button>
+</main>
+
+<!-- Modal -->
+<div
+class="modal fade"
+id="enroll"
+tabindex="-1"
+aria-labelledby="enrollLabel"
+aria-hidden="true"
+>
+<div class="modal-dialog">
+  <div class="modal-content">
+    <div class="modal-header">
+      <h5 class="modal-title" id="enrollLabel">Add new course</h5>
+      <button
+        type="button"
+        class="btn-close"
+        data-bs-dismiss="modal"
+        aria-label="Close"
+      ></button>
+    </div>
+    <div class="modal-body">
+      <form (ngSubmit)="onSubmit()" id="modelForm">
+        <div class="mb-3">
+          <label>Major</label>
+          <select class="form-select" name="major" [ngModel]="modelData.major" (change)="onMajorChange($event)">
+              <option value="علمي">علمي</option>
+              <option value="ادبي">ادبي</option>
+              <option value="مشترك">مواد مشتركة</option>
+          </select>
+        </div>
+        <div class="mb-3">
+            <label>Subject</label>
+            <select class="form-select" name="subject" [(ngModel)]="modelData.subject">
+              <option *ngFor="let subject of subjects[modelData.major]"
+                value="{{subject}}">{{subject}}</option>
+            </select>
+        </div>
+        <div class="mb-3">
+            <label>Teacher</label>
+            <select class="form-select" name="teacherId" [(ngModel)]="modelData.teacherId">
+              <option *ngFor="let teacher of teachers" 
+              value="{{teacher.id}}">{{teacher.fullName}}</option>
+
+              </select>
+        </div>
+        <div class="mb-3">
+            <div class="mb-3">
+                <label for="formFile" class="form-label">course cover image</label>
+                <input 
+                (change)="onFileSelected($event)"
+                name="courseCover"
+                accept="image/*"
+                class="form-control" 
+                [class.is-invalid]="submitted && modelData.courseCover === null || invalidUploadFile" 
+                type="file" id="formFile">
+                <p class="invalid-feedback" *ngIf="modelData.courseCover === null">course cover required</p>
+                <p class="invalid-feedback" *ngIf="invalidUploadFile">only accept images for course cover</p>
+            </div>
+        </div>
+      </form>
+    </div>
+    <div class="modal-footer">
+      <button
+        type="button"
+        class="btn btn-secondary"
+        data-bs-dismiss="modal"
+      >
+        Cancel
+      </button>
+      <button form="modelForm" type="submit" class="btn btn-success">Add</button>
+    </div>
+  </div>
+</div>
+</div>
+</ng-container>
+<ng-container *ngIf="loading">
+  Loading...
+</ng-container>

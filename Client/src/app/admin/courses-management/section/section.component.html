@@ -1,0 +1,104 @@
+<div class="da-en" style="height: 100vh;">
+    <nav class="navbar navbar-expand-lg" style="background-color: #0A2558;">
+        <div class="container">
+          <a class="navbar-brand text-light" routerLink="/admin">Da7ee7 Academy</a>
+        </div>
+    </nav>
+
+    <div class="management-container" *ngIf="section">
+        <h2 class="management-title">
+            <span routerLink="{{'/courses-management/course/' + section.courseId}}" style="cursor: pointer;">Course ({{section.courseId}})</span>
+             / Section({{section.id}})
+             <button title="delete the secion" 
+                (click)="deleteSection()"
+                [disabled]="deleteLoading"
+                class="btn btn-danger px-3 py-4 ms-3">
+                <i class="fa-solid fa-trash fa-lg"></i>
+            </button>
+            </h2>
+
+          
+        <ul class="list-group">
+            <li class="list-group-item" 
+            *ngFor="let sectionItem of section.sectionItems"
+            >
+                {{sectionItem.sectionItemTitle}}
+            </li>
+        </ul>
+    </div>
+
+    <button 
+        data-bs-toggle="modal" data-bs-target="#enroll"
+        title="add new course"
+        class="btn btn-success add-section-item-btn">
+        <i class="fa-solid fa-plus"></i>
+    </button>
+
+    <!-- Modal -->
+    <div
+    class="modal fade"
+    id="enroll"
+    tabindex="-1"
+    aria-labelledby="enrollLabel"
+    aria-hidden="true"
+    >
+    <div class="modal-dialog">
+    <div class="modal-content">
+        <div class="modal-header">
+        <h5 class="modal-title" id="enrollLabel">Add new section item</h5>
+        <button
+            type="button"
+            class="btn-close"
+            data-bs-dismiss="modal"
+            aria-label="Close"
+        ></button>
+        </div>
+        <div class="modal-body">
+        <form  id="modelForm" (ngSubmit)="onAddSectionItemSubmit()">
+            <div class="mb-3">
+                <label [class.text-danger]="submitted && !newSectionItem.sectionItemTitle">Section item title</label>
+                <input type="text" class="form-control" 
+                [class.is-invalid]="submitted && !newSectionItem.sectionItemTitle" 
+                name="sectionItemTitle" 
+                [(ngModel)]="newSectionItem.sectionItemTitle">
+                <p class="invalid-feedback" *ngIf="submitted && !newSectionItem.sectionItemTitle">Section item title required</p>
+            </div>
+            <div class="mb-3">
+                <video #videoElement id="modalVideo" class="mb-3" controls [ngStyle]="{'display': !previewVideoFlag ? 'none' : ''}"></video>
+                <input type="file" class="form-control" 
+                [class]="{'is-invalid': invalidFileUploaded && submitted, 'text-danger': invalidFileUploaded && submitted}"
+                name="file"
+                
+                (change)="onFileSelected($event)">
+                <p class="invalid-feedback" *ngIf="invalidFileUploaded && newSectionItem.file">Only mp4 videos and pdf attachments supported</p>
+                <p class="invalid-feedback" *ngIf="invalidFileUploaded && !newSectionItem.file">File required</p>
+            </div>
+        </form>
+        </div>
+        <div class="modal-footer">
+        <button
+            #resetBtn
+            type="reset"
+            form="modelForm"
+            class="btn btn-primary"
+            (click)="onReset()"
+            [disabled]="loading"
+        >
+            Reset
+        </button>
+        <button
+            #closeBtn
+            type="button"
+            class="btn btn-secondary"
+            data-bs-dismiss="modal"
+            [disabled]="loading"
+        >
+            Cancel
+        </button>
+        <button form="modelForm" type="submit" class="btn btn-success" [disabled]="loading">Add</button>
+        </div>
+    </div>
+    </div>
+    </div>
+</div>
+
