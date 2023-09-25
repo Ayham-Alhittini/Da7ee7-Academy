@@ -1,7 +1,9 @@
+import {CdkDragDrop, CdkDropList, CdkDrag, moveItemInArray} from '@angular/cdk/drag-drop';
 import { Component, ElementRef, OnInit, ViewChild } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { ToastrService } from 'ngx-toastr';
 import { Section } from 'src/app/models/section';
+import { SectionItem } from 'src/app/models/sectionItem';
 import { ManageCoursesService } from 'src/app/services/manage-courses.service';
 
 @Component({
@@ -12,25 +14,45 @@ import { ManageCoursesService } from 'src/app/services/manage-courses.service';
 export class SectionComponent  implements OnInit{
   
   /**
-   * This component contain more than one functionality
-   * it have a a detail about the section including section items
+   * This component contain (4) functionality
    * 
-   * it also have add new section item modal
-   * 
+   * 1 - show section items list
+   * 2 - delete section
+   * 3 - add new section item
+   * 4 - edit section item
+   * 5 - reorder the section items
    */
 
   @ViewChild('videoElement') videoElement: ElementRef;
-  @ViewChild('closeBtn') closeBtn: ElementRef;
+  @ViewChild('editMoadlVideo') editMoadlVideo: ElementRef;
   @ViewChild('resetBtn') resetBtn: ElementRef;
+  @ViewChild('editCloseBtn') editCloseBtn: ElementRef;
 
   sectionId = null;
   section: Section = null;
 
-  invalidFileUploaded = false;
-  submitted = false;
-  loading = false;
+  OnlyNULL = null;///to erase the file name when close the edit modal
+
+  orderChanged = false;
+
+  addSectionItemModal = {
+    invalidFileUploaded : false,
+    submitted: false,
+    loading: false,
+    previewVideoFlag: false,
+  }
+
   deleteLoading = false;
-  previewVideoFlag = false;
+  editLoading = false;
+  
+  activeSectionItem = {
+    id: null,
+    sectionItemTitle: null,
+    contentUrl: null,
+    type: null,
+    videoLength: null,
+    file: null
+  };
 
   newSectionItem = {
     sectionId : null,
@@ -40,7 +62,12 @@ export class SectionComponent  implements OnInit{
   };
 
 
-  constructor(private route: ActivatedRoute, 
+  drop(event: CdkDragDrop<string[]>) {
+    this.orderChanged = true;
+    moveItemInArray(this.section.sectionItems, event.previousIndex, event.currentIndex);
+  }
+
+  constructor(route: ActivatedRoute, 
     private manageCoursesService: ManageCoursesService, 
     private toaster: ToastrService, 
     private router: Router) {
@@ -48,6 +75,7 @@ export class SectionComponent  implements OnInit{
     this.sectionId = sectionId;
     this.newSectionItem.sectionId = sectionId;
     this.newSectionItem.videoLength = 0;
+    this.activeSectionItem.videoLength = 0;
   }
 
   ngOnInit(): void {
@@ -62,16 +90,28 @@ export class SectionComponent  implements OnInit{
     }
   }
 
+  onEditSectionTitle() {
+    this.manageCoursesService.editSectionTitle(this.section.id, this.section.sectionTitle).subscribe(() => {
+      this.toaster.success('Section title edited successfuly');
+    });
+  }
+
+  onSectionItemClick(sectionItem: SectionItem) {
+    this.OnlyNULL = null;
+    this.activeSectionItem = {...sectionItem, file: null};
+  }
+
+
   onFileSelected(event: any) {
     const file = event.target.files[0];
     this.newSectionItem.file = file;
-    this.previewVideoFlag = false;
+    this.addSectionItemModal.previewVideoFlag = false;
 
     if (!file) {
-      this.invalidFileUploaded = true;
+      this.addSectionItemModal.invalidFileUploaded = true;
       return;
     } else {
-      this.invalidFileUploaded = false;
+      this.addSectionItemModal.invalidFileUploaded = false;
     }
 
 
@@ -79,12 +119,12 @@ export class SectionComponent  implements OnInit{
     const isAttachment = this.isAttachment(file);
 
     if (!isLecture && !isAttachment) {
-      this.invalidFileUploaded = true;
+      this.addSectionItemModal.invalidFileUploaded = true;
       return;
     }
 
     if (isLecture) {
-      this.previewVideo(file);
+      this.previewAddVideo(file);
     } else {
       this.newSectionItem.videoLength = 0;
     }
@@ -94,14 +134,14 @@ export class SectionComponent  implements OnInit{
 
   onAddSectionItemSubmit() {
 
-    this.submitted = true;
+    this.addSectionItemModal.submitted = true;
     
-    if (this.invalidFileUploaded || this.newSectionItem.sectionItemTitle === null) {
+    if (this.addSectionItemModal.invalidFileUploaded || this.newSectionItem.sectionItemTitle === null) {
       return;
     }
 
     if (!this.newSectionItem.file) {
-      this.invalidFileUploaded = true;
+      this.addSectionItemModal.invalidFileUploaded = true;
       return;
     }
     const formData = new FormData();
@@ -112,11 +152,11 @@ export class SectionComponent  implements OnInit{
     formData.append('VideoLength', videoLength);
     formData.append('File', this.newSectionItem.file);
 
-    this.loading = true;
+    this.addSectionItemModal.loading = true;
     this.manageCoursesService.addCourseSectionItem(formData).subscribe({
       next: () => {
         this.toaster.success("Content added successfuly 👍");
-        this.loading = false;
+        this.addSectionItemModal.loading = false;
         setTimeout(() => {
           this.resetBtn.nativeElement.click();
           // this.closeBtn.nativeElement.click();
@@ -125,10 +165,80 @@ export class SectionComponent  implements OnInit{
       },
       error : err => {
         console.log(err);
-        this.loading = false;
+        this.addSectionItemModal.loading = false;
       }
     });
   }
+
+  onEditSectionItemSubmit() {
+    if (this.invalidSectionItemTitle(this.activeSectionItem)) {
+      return;
+    }
+    
+    const formData = new FormData();
+    const videoLength = ''+ Math.floor(this.activeSectionItem.videoLength);
+    formData.append('Id', this.activeSectionItem.id);
+    formData.append('SectionItemTitle', this.activeSectionItem.sectionItemTitle);
+    formData.append('VideoLength', videoLength);
+    formData.append('File', this.activeSectionItem.file);
+
+    this.editLoading = true;
+    this.manageCoursesService.editSectionItem(formData).subscribe({
+      next: () => {
+        this.toaster.success("Updated successfuly");
+        this.editLoading = false;
+
+        //an alternative to refetch the section
+        ///get the section item from section and edit it
+        var sectionItem = this.section.sectionItems.find(si => si.id === this.activeSectionItem.id);
+
+        sectionItem.id = this.activeSectionItem.id;
+        sectionItem.sectionItemTitle = this.activeSectionItem.sectionItemTitle;
+        sectionItem.contentUrl = this.activeSectionItem.contentUrl;
+        sectionItem.type = this.activeSectionItem.type;
+        
+
+        setTimeout(() => {
+          this.editCloseBtn.nativeElement.click();
+        }, 500);
+      },
+      error: err => {
+        this.toaster.error('Error occur while updating');
+        console.log(err);
+        this.editLoading = false;
+      }
+    })
+    
+  }
+
+  onEditSectionItemFileSelected(event: any) {
+
+    const file = event.target.files[0];
+    
+    if (!file) {
+      return;
+    }
+    
+    const isLecture = this.isLecture(file);
+    const isAttachment = this.isAttachment(file);
+
+    if (!isLecture && !isAttachment) {
+      this.toaster.error("Unsupported media expect only mp4 for lectures and pdf for attachments", "File not taken", {
+        timeOut: 5000
+      });
+      return;
+    }
+
+    this.activeSectionItem.file = file;
+    if (isLecture) {
+      this.previewEditVideo(file);
+    } else {
+      this.activeSectionItem.type = 1;
+      this.activeSectionItem.videoLength = 0;
+      this.activeSectionItem.contentUrl = URL.createObjectURL(file);
+    }
+  }
+
 
   deleteSection() {
     const response = confirm("Are you sure, the section will be deleted");
@@ -142,9 +252,9 @@ export class SectionComponent  implements OnInit{
   }
 
   onReset() {
-    this.invalidFileUploaded = false;
-    this.submitted = false;
-    this.previewVideoFlag = false;
+    this.addSectionItemModal.invalidFileUploaded = false;
+    this.addSectionItemModal.submitted = false;
+    this.addSectionItemModal.previewVideoFlag = false;
 
     this.newSectionItem = {
       sectionId: this.sectionId,
@@ -155,13 +265,42 @@ export class SectionComponent  implements OnInit{
 
   }
 
+
+  saveOrderChanges() {
+
+    const newOrder = {
+      sectionId: this.section.id,
+      sectionItemsIds: []
+    };
+
+    for (let index = 0; index < this.section.sectionItems.length; index++) {
+      const element = this.section.sectionItems[index];
+      newOrder.sectionItemsIds.push(element.id);
+    }
+
+    this.manageCoursesService.editSectionItemsOrder(newOrder).subscribe(() => {
+      this.toaster.show("Changes Saved", null, {
+        positionClass: 'toast-bottom-center'
+      })
+      this.orderChanged = false;
+    });
+  }
+
+
+  ///validation for edit modal
+  invalidSectionItemTitle(source: any) {
+    return source.sectionItemTitle === null ||
+           source.sectionItemTitle === '';
+  }
+
+
   private isLecture(file: File): boolean {
     return file?.name.endsWith(".mp4");
   }
   private isAttachment(file: File): boolean {
     return file?.name.endsWith(".pdf");
   }
-  private previewVideo(file : File) {
+  private previewAddVideo(file : File) {
     if (file) {
       // Create a URL for the selected video file
       const videoURL = URL.createObjectURL(file);
@@ -171,8 +310,23 @@ export class SectionComponent  implements OnInit{
 
       // Load the video metadata to get its duration
       this.videoElement.nativeElement.onloadedmetadata = () => {
-        this.previewVideoFlag = true;
+        this.addSectionItemModal.previewVideoFlag = true;
         this.newSectionItem.videoLength = this.videoElement.nativeElement.duration;
+      };
+    }
+  }
+  private previewEditVideo(file : File) {
+    if (file) {
+      // Create a URL for the selected video file
+      const videoURL = URL.createObjectURL(file);
+
+      // Set the video source to the URL
+      this.activeSectionItem.contentUrl = videoURL;
+
+      // Load the video metadata to get its duration
+      this.editMoadlVideo.nativeElement.onloadedmetadata = () => {
+        this.activeSectionItem.videoLength = this.editMoadlVideo.nativeElement.duration;
+        this.activeSectionItem.type = 2;
       };
     }
   }

@@ -1,5 +1,9 @@
 <div class="center-container">
     <form [formGroup]="singupForm" (ngSubmit)="onSubmit()" class="form_main" action="">
+        <a routerLink="/" class="navbar-brand mx-0 nuxt-link-exact-active nuxt-link-active bold big" style="color: #fb513e;">
+            <span class="ms-1">Da7ee7 Academy</span>
+            <i class="fa-solid fa-graduation-cap"></i>
+        </a>
         <p class="heading">حساب جديد</p>
         <div class="inputContainer">
             <input formControlName="fullName"

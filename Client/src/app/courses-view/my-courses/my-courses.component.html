@@ -1,0 +1,17 @@
+<app-navbar></app-navbar>
+<div class="container">
+    <span class="big mt-4 d-block" style="color: #fb513e;">دوراتي</span>
+    <div class="row">
+        <div *ngFor="let course of courses" routerLink="{{'/course/' + course.id}}" class="card course-card" style="width: 18rem;">
+            <img src="{{course.coursePhotoUrl}}" class="card-img-top" style="height: 156px;" alt="...">
+            <div class="card-body">
+                <p class="card-text course-major">{{course.major}}</p>
+            <h5 class="card-title mb-3">{{course.subject}}</h5>
+            <div class="d-flex align-items-center course-card-teacher">
+                <img src="{{getTeacher(course.teacherId)?.userPhotoUrl || './assets/user.png'}}" alt="...">
+                <p class="card-text">{{getTeacher(course.teacherId)?.fullName}}</p>
+            </div>
+            </div>
+        </div>
+    </div>
+</div>

@@ -1,17 +1,17 @@
 {
   "format": 1,
   "restore": {
-    "D:\\Da7ee7_Academy\\Da7ee7_Academy\\Da7ee7_Academy.csproj": {}
+    "D:\\Da7ee7_Academy\\api\\da7ee7_academy\\Da7ee7_Academy.csproj": {}
   },
   "projects": {
-    "D:\\Da7ee7_Academy\\Da7ee7_Academy\\Da7ee7_Academy.csproj": {
+    "D:\\Da7ee7_Academy\\api\\da7ee7_academy\\Da7ee7_Academy.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "D:\\Da7ee7_Academy\\Da7ee7_Academy\\Da7ee7_Academy.csproj",
+        "projectUniqueName": "D:\\Da7ee7_Academy\\api\\da7ee7_academy\\Da7ee7_Academy.csproj",
         "projectName": "Da7ee7_Academy",
-        "projectPath": "D:\\Da7ee7_Academy\\Da7ee7_Academy\\Da7ee7_Academy.csproj",
+        "projectPath": "D:\\Da7ee7_Academy\\api\\da7ee7_academy\\Da7ee7_Academy.csproj",
         "packagesPath": "C:\\Users\\ayham\\.nuget\\packages\\",
-        "outputPath": "D:\\Da7ee7_Academy\\Da7ee7_Academy\\obj\\",
+        "outputPath": "D:\\Da7ee7_Academy\\api\\da7ee7_academy\\obj\\",
         "projectStyle": "PackageReference",
         "configFilePaths": [
           "C:\\Users\\ayham\\AppData\\Roaming\\NuGet\\NuGet.Config",
@@ -44,10 +44,6 @@
             "AutoMapper.Extensions.Microsoft.DependencyInjection": {
               "target": "Package",
               "version": "[12.0.0, )"
-            },
-            "CloudinaryDotNet": {
-              "target": "Package",
-              "version": "[1.20.0, )"
             },
             "Microsoft.AspNetCore.Authentication.JwtBearer": {
               "target": "Package",

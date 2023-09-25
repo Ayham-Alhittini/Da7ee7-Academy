@@ -8,12 +8,6 @@ import { AccountService } from '../services/account.service';
 })
 export class NavbarComponent {
   constructor(public accountService: AccountService){}
-  activePage = 'home';
-  pages = [
-    'home',
-    'courses',
-    'teachers',
-    'blogs',
-    'sell-points'
-  ];
+
+  navExpanded = false;
 }

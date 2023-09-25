@@ -6,6 +6,7 @@ using Da7ee7_Academy.Entities;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using System.ComponentModel.DataAnnotations;
 
 namespace Da7ee7_Academy.Controllers
 {
@@ -275,7 +276,168 @@ namespace Da7ee7_Academy.Controllers
             return Ok();
         }
 
+        ///edit end-points
+        [HttpPatch("update-section-title/{sectionId}")]
+        public ActionResult UpdateSectionTitle(int sectionId, [Required] string NewSectionTitle)
+        {
+            var section = _context.Sections.Find(sectionId);
 
+            section.SectionTitle = NewSectionTitle;
+
+            _context.SaveChanges();
+
+            return Ok();
+        }
+
+        [HttpPatch("update-section-item")]
+        [RequestSizeLimit(1000 * 1024 * 1024)]///MAX SIZE 1 GB
+        public ActionResult UpdateSectionItem([FromForm]UpdateSectionItemDto updateSectionItem)
+        {
+            var sectionItem = _context.SectionItems
+                .Include(si => si.File)
+                .FirstOrDefault(si => si.Id == updateSectionItem.Id);
+
+            if (sectionItem == null)
+            {
+                return NotFound();
+            }
+
+            ///not related to file directly
+            sectionItem.SectionItemTitle = updateSectionItem.SectionItemTitle;
+
+            ///no need to continue since we don't need to update the file
+            if (updateSectionItem.File == null)
+            {
+                _context.SaveChanges();
+                return Ok();
+            }
+
+            //check the type
+            string fileExtension = Path.GetExtension(updateSectionItem.File.FileName).ToLower();
+            int type = -1;
+            if (fileExtension != ".pdf" && fileExtension != ".mp4")
+            {
+                return BadRequest("Unexpcted type only accept mp4 files for video and pdf for attachments");
+            }
+            else
+            {
+                switch (fileExtension)
+                {
+                    case ".pdf":
+                        type = 1; updateSectionItem.VideoLength = 0;
+                        break;
+                    case ".mp4":
+                        type = 2;
+                        break;
+                }
+            }
+
+
+            ///get the section to update the total section time
+            var section = _context.Sections.Find(sectionItem.SectionId);
+
+            section.TotalSectionTime -= sectionItem.VideoLength;///substract old time
+            section.TotalSectionTime += updateSectionItem.VideoLength;///add the new time
+            
+            
+            sectionItem.VideoLength = updateSectionItem.VideoLength;
+            sectionItem.Type = type;
+
+            /*
+             FOR THE FILE
+            -we will not delete it from database but we delete the one 
+            in the folder and replace it with the new one
+            -no need to update content url because it will be stay on the same id
+             */
+
+            //delete the old file
+            var filePath = Path.Combine(Directory.GetCurrentDirectory(),
+                sectionItem.File.Path, sectionItem.File.FileName);
+            System.IO.File.Delete(filePath);
+
+            //update to match the new file
+            sectionItem.File.FileName = sectionItem.File.Id + "." + fileExtension;
+            sectionItem.File.ContentType = updateSectionItem.File.ContentType;
+
+            //update the file path
+            filePath = Path.Combine(Directory.GetCurrentDirectory(),
+                sectionItem.File.Path, sectionItem.File.FileName);
+
+            using (var stream = new FileStream(filePath, FileMode.Create))
+            {
+                updateSectionItem.File.CopyTo(stream);
+            }
+
+            _context.SaveChanges();
+            return Ok();
+        }
+
+
+        [HttpPatch("edit-section-items-order")]
+        public ActionResult EditSectionItemsOrder(ChangeSectionItemsOrderDto NewOrder)
+        {
+            var section = _context.Sections.
+                Where(s => s.Id == NewOrder.SectionId)
+                .Include(s => s.SectionItems)
+                .FirstOrDefault();
+
+            if (section == null)
+            {
+                return NotFound("Section not exist");
+            }
+
+            if (NewOrder.SectionItemsIds.Count != section.SectionItems.Count)
+            {
+                return BadRequest($"Send all the section items new order miss ({section.SectionItems.Count - NewOrder.SectionItemsIds.Count})");
+            }
+
+            foreach (var sectionItem in section.SectionItems)
+            {
+                var newOrder = NewOrder.SectionItemsIds.IndexOf(sectionItem.Id) + 1;
+                if (newOrder == 0)
+                {
+                    return BadRequest("Not all sections id accurate");
+                }
+                sectionItem.OrderNumber = newOrder;
+            }
+
+            _context.SaveChanges();
+
+            return Ok();
+        }
+
+        [HttpPatch("edit-sections-order")]
+        public ActionResult EditSectionsOrder(ChangeSectionsOrderDto NewOrder)
+        {
+            var course = _context.Courses
+                .Where(course => course.Id == NewOrder.CourseId)
+                .Include(course => course.Sections)
+                .FirstOrDefault();
+
+            if (course == null)
+            {
+                return NotFound();
+            }
+
+            if (course.Sections.Count != NewOrder.SectionIds.Count)
+            {
+                return BadRequest($"Expect only {course.Sections.Count} sections id");
+            }
+
+            foreach(var section in course.Sections)
+            {
+                var newOrder = NewOrder.SectionIds.IndexOf(section.Id) + 1;
+                if (newOrder == 0)
+                {
+                    return BadRequest("Not all sections id accurate");
+                }
+                section.OrderNumber = newOrder;
+            }
+
+            _context.SaveChanges();
+
+            return Ok();
+        }
 
         ///end-points to get the data to about the course to manage it
         

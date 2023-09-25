@@ -1,4 +1,4 @@
-<div class="da-en" style="height: 100vh;">
+<div class="da-en">
     <nav class="navbar navbar-expand-lg" style="background-color: #0A2558;">
         <div class="container">
           <a class="navbar-brand text-light" routerLink="/admin">Da7ee7 Academy</a>
@@ -6,20 +6,30 @@
     </nav>
 
     <div class="management-container">
+        <div class="alert alert-info" role="alert">
+            Drag the items to change there order
+          </div>
         <h2 class="management-title">Course #{{courseId}}</h2>
 
-        <form class="input-container" (ngSubmit)="newSection()" autocomplete="off">
-            <input placeholder="Section Title" type="text" name="sectionTitle" [(ngModel)]="_newSection">
-            <button class="button" type="submit">Add</button>
-        </form>
-          
-        <ul class="list-group">
-            <li class="list-group-item" 
-            *ngFor="let section of sections"
-            routerLink="{{'/courses-management/section/' + section.id}}"
-            >
-                {{section.sectionTitle}}
-            </li>
+        <div class="d-flex justify-content-center align-items-baseline">
+            <form class="input-container" (ngSubmit)="newSection()" autocomplete="off">
+                <input placeholder="Section Title" type="text" name="sectionTitle" [(ngModel)]="_newSection">
+                <button class="button" type="submit">Add</button>
+            </form>
+            
+            <button *ngIf="orderChanged" (click)="onSaveOrderChanges()"
+             class="btn btn-warning ms-5 p-3 text-danger">Save Order Changes</button>
+        </div>
+        <ul 
+            cdkDropList
+            (cdkDropListDropped)="drop($event)"
+            class="list-group">
+                <li 
+                    class="list-group-item" 
+                    *ngFor="let section of sections"
+                    routerLink="{{'/courses-management/section/' + section.id}}"
+                    cdkDrag
+                >{{section.sectionTitle}}</li>
         </ul>
     </div>
 </div>

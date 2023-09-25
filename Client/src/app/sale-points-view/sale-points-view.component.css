@@ -1,0 +1,42 @@
+.governorate-search {
+    color: #023373;
+    width: 100%;
+    padding: 10px;
+    font-size: 1.2em;
+    border: none;
+    background-color: #fbfbfb;
+    appearance: none;
+}
+
+.governorate-search:focus {
+    border: none;
+    outline: none;
+    box-shadow: none;
+}
+
+.sale-points-container {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: flex-start;
+}
+
+.sale-point {
+    background-color: #fff;
+    width: 360px;
+    padding: 20px;
+    border-radius: 30px;
+    box-shadow: 0 6px 22px hsla(0,0%,63.5%,.16078);
+    margin-bottom: 5vh;
+}
+
+.sale-point-holder {
+    display: flex;
+    align-items: center;
+    text-align: right;
+    color: #023373;
+}
+
+.sale-point-holder .name {
+    font-size: 1.4em;
+    font-weight: bold;
+}

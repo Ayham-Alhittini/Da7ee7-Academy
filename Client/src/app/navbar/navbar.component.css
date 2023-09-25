@@ -1,6 +1,7 @@
 .navbar-da {
-    background-color: #fff;
-    font-weight: 600;
+    padding: 0;
+    box-shadow: 0 2px 4px rgba(0,0,0,.08), 0 4px 12px rgba(0,0,0,.08);
+    background-color: #fff!important;
 }
 .dropdown-menu .dropdown-item {
     text-align: right;
@@ -15,6 +16,13 @@
     color: #fb513e;
     padding-bottom: 5px;
     border-bottom: 3px solid #fb513e;
+}
+.da-navbar-toggle {
+    padding: 5px;
+    border: none;
+    background-color: transparent;
+    font-size: 1.3em;
+    display: none;
 }
 
 .navbar-alert {
@@ -50,5 +58,99 @@
     border-radius: 50%;
 }
 .student-courses {
-    color:#FFFFFF !important;background-color:rgb(21 39 132 / 80%);
+    padding: 20px 40px;
+    /* min-width: 80px; */
+    border-radius: 0;
+    color:#FFFFFF !important;
+    background-color:rgb(21 39 132 / 80%);
+}
+.da-container {
+    padding-left: 10vw;
+    padding-right: 10vw;
+    display: flex;
+    flex-wrap: nowrap;
+}
+
+.auth-nav {
+    display: flex;
+    flex-wrap: nowrap;
+    flex-direction: row;
+    /* width: 30vw; */
+}
+.auth-nav .nav-item button {
+    max-width: 120px;
+    display: inline;
+}
+
+.overlay {
+    position: fixed;
+    width: 100%;
+    height: 100%;
+    top: 0;
+    right: 0;
+    left: 0;
+    right: 0;
+    background-color: rgba(0,0,0,0.5);
+    z-index: 1000;
+}
+.da-side-bar {
+    position: fixed;
+    width: 70%;
+    height: 100vh;
+    top: 0;
+    right: 0;
+    background-color: #fff;
+    z-index: 1001;
+    text-align: start;
+}
+
+.da-side-bar a {
+    font-size: 1.5em;
+    text-decoration: none;
+    color: #363636;
+    display: block;
+    margin-bottom: 20px;
+}
+
+.dropdown-menu {
+    position: absolute;
+}
+
+@media(max-width: 991px) {
+    .da-navbar-toggle {
+        display: inline-block;
+    }
+
+    .main-nav {
+        display: none;
+    }
+
+    .da-container {
+        padding-left: 2vw;
+        padding-right: 2vw;
+    }
+    .username {
+        display: none;
+    }
+    .student-courses  {
+        padding: 15px 5px;
+    }
+    .navbar-brand {
+        font-size: 1.1em;
+    }
+}
+
+@media(max-width: 480px) {
+    .auth-nav .nav-item button {
+        font-size: 0.8em;
+    }
+}
+
+@media (max-width: 337px) {
+    * {
+        padding: 0;
+    }
+    .navbar-brand {
+        display: none;
+    }
 }

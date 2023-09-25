@@ -1,0 +1,108 @@
+<app-navbar></app-navbar>
+<div class="container">
+    <h5 class="mt-5" style="color: #fb513e;">نقاط البيع</h5>
+    <div class="mb-5">
+        <label class="text-muted" style="font-size: 1.2em;">البحث حسب المنطقة</label>
+        <select class="governorate-search mt-1" (change)="onSelectedGovChange($event)">
+            <option value="all">جميع المحافظات</option>
+            <option *ngFor="let gov of governorates" value="{{gov}}">{{gov}}</option>
+        </select>
+    </div>
+
+    <button *ngIf="(accountService.loadedUser | async)?.role === 'Admin'"
+        (click)="onReset()"
+        class="btn add-btn" 
+        data-bs-toggle="modal" data-bs-target="#addSalePoint"
+        style="background-color: #fb513e; color: #fff;">
+        <i class="fa fa-plus"></i>
+    </button>
+    
+    <div class="sale-points-container">
+        <div *ngFor="let salePoint of salePoints" class="sale-point ms-5">
+                <div class="sale-point-holder mb-3">
+                    <div>
+                        <i class="fa-solid fa-book fa-2xl ms-3" style="color: #fb513e;"></i>
+                        <span class="name">{{salePoint.name}}</span>
+                    </div>
+                    <button *ngIf="(accountService.loadedUser | async)?.role === 'Admin'"
+                     (click)="onSalePointDelete(salePoint)" class="btn btn-danger" style="margin-right: auto;"><i class="fa fa-trash"></i></button>
+                </div>
+                <a class="sale-point-holder mb-3" style="cursor: pointer; text-decoration: none;" href="{{salePoint.addressUrl}}">
+                    <i class="fa-solid fa-location-dot ms-3 fa-lg pe-2"></i>
+                    <span style="font-size: 1.2em;">{{salePoint.address}}</span>
+                </a>
+                <div class="sale-point-holder">
+                    <i class="fa-solid fa-phone ms-3 fa-lg pe-1"></i>
+                    <span style="font-size: 1.1em;">{{salePoint.phoneNumber}}</span>
+                </div>
+        </div>
+    </div>
+</div>
+
+<!-- Add new sale point modal -->
+<div class="da-en">
+    <div
+    class="modal fade"
+    id="addSalePoint"
+    tabindex="-1"
+    aria-hidden="true"
+    >
+    <div class="modal-dialog">
+    <div class="modal-content">
+        <div class="modal-header">
+        <h5 class="modal-title">Add new sale point</h5>
+        <button
+            type="button"
+            class="btn-close"
+            data-bs-dismiss="modal"
+            aria-label="Close"
+        ></button>
+        </div>
+        <div class="modal-body">
+        <form [formGroup]="addSalePointForm" (ngSubmit)="onAddSaleSubmit()" id="modelForm">
+            <div class="mb-3">
+                <label>Name</label>
+                <input [class.is-invalid]="addSalePointForm.get('name').invalid && addSalePointForm.get('name').touched" type="text" class="form-control" formControlName="name">
+            </div>
+            <div class="mb-3">
+                <label>Address</label>
+                <input [class.is-invalid]="addSalePointForm.get('address').invalid && addSalePointForm.get('address').touched"
+                 type="text" class="form-control" formControlName="address">
+            </div>
+            <div class="mb-3">
+                <label>Governorate</label>
+                <select [class.is-invalid]="addSalePointForm.get('governorate').invalid && addSalePointForm.get('governorate').touched"
+                formControlName="governorate" class="form-select">
+                    <option *ngFor="let gov of governorates" value="{{gov}}">{{gov}}</option>
+                </select>
+            </div>
+            <div class="mb-3">
+                <label>Google map address url</label>
+                <input [class.is-invalid]="addSalePointForm.get('addressUrl').invalid && addSalePointForm.get('addressUrl').touched"
+                type="url" class="form-control" formControlName="addressUrl">
+            </div>
+
+            <div class="mb-3">
+                <label>Phone number</label>
+                <input [class.is-invalid]="addSalePointForm.get('phoneNumber').invalid && addSalePointForm.get('phoneNumber').touched"
+                 type="text" class="form-control" formControlName="phoneNumber">
+            </div>
+        </form>
+        </div>
+        <div class="modal-footer">
+        <button
+            #closeBtn
+            type="button"
+            class="btn btn-secondary"
+            data-bs-dismiss="modal"
+        >
+            Cancel
+        </button>
+        <button 
+        [disabled]="addSalePointForm.invalid"
+        form="modelForm" type="submit" class="btn btn-success">Add</button>
+        </div>
+    </div>
+    </div>
+    </div>
+</div>

@@ -41,9 +41,20 @@ export class AccountService {
     window.location.href = '/';
   }
 
-
   studentRegister(model : any) {
     return this.http.post<User>(this.baseUrl + "account/student-register", model);
+  }
+
+  getProfile() {
+    return this.http.get<User>(this.baseUrl + "account/get-profile");
+  }
+
+  updateProfile(model : any) {
+    return this.http.post(this.baseUrl + "account/update-profile", model);
+  }
+
+  chanePassword(modal: any) {
+    return this.http.post(this.baseUrl + "account/change-password", modal);
   }
 
   setCurrentUser(user : User) {
@@ -53,5 +64,9 @@ export class AccountService {
 
   changePassword(model: any) {
     return this.http.post(this.baseUrl + "account/change-password", model);
+  }
+
+  addTeacher(newTeacher: any) {
+    return this.http.post(this.baseUrl + "account/teacher-register", newTeacher);
   }
 }

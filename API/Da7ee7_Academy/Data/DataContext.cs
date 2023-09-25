@@ -19,6 +19,7 @@ namespace Da7ee7_Academy.Data
         public DbSet<SalePoint> SalePoints { get; set; }
         public DbSet<AppFile> Files { get; set; }
         public DbSet<WatchedLecture> WatchedLectures { get; set; }
+        public DbSet<CourseCard> Cards { get; set; }
 
         protected override void OnModelCreating(ModelBuilder builder)
         {

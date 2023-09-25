@@ -1,4 +1,5 @@
 using Da7ee7_Academy.Data;
+using Da7ee7_Academy.Data.Repository;
 using Da7ee7_Academy.Entities;
 using Da7ee7_Academy.Helper;
 using Da7ee7_Academy.Interfaces;
@@ -78,6 +79,7 @@ builder.Services.Configure<FormOptions>(options =>
 builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
 builder.Services.AddScoped<IEmailService, EmailService>();
 builder.Services.AddScoped<ITokenService, TokenService>();
+builder.Services.AddScoped<IPhotoRepository, PhotoRepository>();
 
 
 

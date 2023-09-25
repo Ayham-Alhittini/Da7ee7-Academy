@@ -1,0 +1,27 @@
+.blog-card {
+    box-shadow: 0 3px 5px lightgray;
+    height: 350px;
+}
+
+.blog-card-img {
+    height: 225px;
+}
+.blog-card-title {
+    padding: 20px;
+}
+
+.home-courses {
+    display: flex;
+    flex-wrap: wrap;
+    width: 100%;
+}
+.all-courses {
+    padding: 6px 8px;
+    border-radius: 5px;
+    background-color: #3744ac;
+    color: #fff;
+    border: none;
+}
+.all-courses:hover {
+    opacity: 0.5;
+}

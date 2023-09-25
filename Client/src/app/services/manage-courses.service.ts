@@ -40,4 +40,22 @@ export class ManageCoursesService {
   deleteCourseSection(sectionId: number) {
     return this.http.delete(this.baseUrl + '/delete-course-section/' + sectionId);
   }
+
+  editSectionTitle(sectionId: number, newSectionTitle: string) {
+    return this.http
+    .patch(this.baseUrl + '/update-section-title/' + sectionId + '?NewSectionTitle='+ newSectionTitle 
+    , null);
+  }
+
+  editSectionItem(formData: any) {
+    return this.http.patch(this.baseUrl + '/update-section-item', formData);
+  }
+
+  editSectionItemsOrder(newOrder: any) {
+    return this.http.patch(this.baseUrl + '/edit-section-items-order', newOrder);
+  }
+
+  editSectionsOrder(newOrder: any) {
+    return this.http.patch(this.baseUrl + '/edit-sections-order', newOrder);
+  }
 }

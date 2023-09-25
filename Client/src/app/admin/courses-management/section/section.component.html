@@ -1,4 +1,4 @@
-<div class="da-en" style="height: 100vh;">
+<div class="da-en" style="min-height: 100vh;">
     <nav class="navbar navbar-expand-lg" style="background-color: #0A2558;">
         <div class="container">
           <a class="navbar-brand text-light" routerLink="/admin">Da7ee7 Academy</a>
@@ -6,6 +6,9 @@
     </nav>
 
     <div class="management-container" *ngIf="section">
+        <div class="alert alert-info" role="alert">
+            Drag the items to change there order
+          </div>
         <h2 class="management-title">
             <span routerLink="{{'/courses-management/course/' + section.courseId}}" style="cursor: pointer;">Course ({{section.courseId}})</span>
              / Section({{section.id}})
@@ -17,27 +20,47 @@
             </button>
             </h2>
 
-          
-        <ul class="list-group">
-            <li class="list-group-item" 
-            *ngFor="let sectionItem of section.sectionItems"
-            >
-                {{sectionItem.sectionItemTitle}}
-            </li>
+            <form class="form-group d-flex justify-content-center mb-5 ms-auto">
+                <input type="text" class="form-control w-25 edit-section-title" 
+                name="sectionTitle"
+                [(ngModel)]="section.sectionTitle">
+                <button class="btn" 
+                type="submit"
+                (click)="onEditSectionTitle()"
+                style="background-color: #0A2458; color: #fff;">Edit</button>
+                <button 
+                    *ngIf="orderChanged"
+                    (click)="saveOrderChanges()"
+                    class="btn btn-warning ms-3 text-danger">
+                        Save Order Changes</button>
+            </form>
+
+        <hr>
+        
+        <ul cdkDropList class="list-group" (cdkDropListDropped)="drop($event)">
+            <li 
+                class=" list-group-item" *ngFor="let sectionItem of section.sectionItems"
+                data-bs-toggle="modal" data-bs-target="#edit"
+                (click)="onSectionItemClick(sectionItem)"
+                cdkDrag>
+                {{sectionItem.sectionItemTitle}}</li>
         </ul>
+
+        <h4 class="lead mt-5" *ngIf="section.sectionItems.length === 0">No Section Items Exist</h4>
+          
     </div>
 
     <button 
-        data-bs-toggle="modal" data-bs-target="#enroll"
+        data-bs-toggle="modal" data-bs-target="#add"
         title="add new course"
         class="btn btn-success add-section-item-btn">
         <i class="fa-solid fa-plus"></i>
     </button>
 
-    <!-- Modal -->
+    <!-- Add New Section Item Modal -->
     <div
     class="modal fade"
-    id="enroll"
+    id="add"
     tabindex="-1"
     aria-labelledby="enrollLabel"
     aria-hidden="true"
@@ -56,22 +79,23 @@
         <div class="modal-body">
         <form  id="modelForm" (ngSubmit)="onAddSectionItemSubmit()">
             <div class="mb-3">
-                <label [class.text-danger]="submitted && !newSectionItem.sectionItemTitle">Section item title</label>
+                <label [class.text-danger]="addSectionItemModal.submitted && !newSectionItem.sectionItemTitle">Section item title</label>
                 <input type="text" class="form-control" 
-                [class.is-invalid]="submitted && !newSectionItem.sectionItemTitle" 
+                [class.is-invalid]="addSectionItemModal.submitted && !newSectionItem.sectionItemTitle" 
                 name="sectionItemTitle" 
                 [(ngModel)]="newSectionItem.sectionItemTitle">
-                <p class="invalid-feedback" *ngIf="submitted && !newSectionItem.sectionItemTitle">Section item title required</p>
+                <p class="invalid-feedback" *ngIf="addSectionItemModal.submitted && !newSectionItem.sectionItemTitle">Section item title required</p>
             </div>
             <div class="mb-3">
-                <video #videoElement id="modalVideo" class="mb-3" controls [ngStyle]="{'display': !previewVideoFlag ? 'none' : ''}"></video>
+                <video #videoElement id="modalVideo" class="mb-3" controls [ngStyle]="{'display': !addSectionItemModal.previewVideoFlag ? 'none' : ''}"></video>
                 <input type="file" class="form-control" 
-                [class]="{'is-invalid': invalidFileUploaded && submitted, 'text-danger': invalidFileUploaded && submitted}"
+                [class]="{'is-invalid': addSectionItemModal.invalidFileUploaded && addSectionItemModal.submitted, 
+                'text-danger': addSectionItemModal.invalidFileUploaded && addSectionItemModal.submitted}"
                 name="file"
                 
                 (change)="onFileSelected($event)">
-                <p class="invalid-feedback" *ngIf="invalidFileUploaded && newSectionItem.file">Only mp4 videos and pdf attachments supported</p>
-                <p class="invalid-feedback" *ngIf="invalidFileUploaded && !newSectionItem.file">File required</p>
+                <p class="invalid-feedback" *ngIf="addSectionItemModal.invalidFileUploaded && newSectionItem.file">Only mp4 videos and pdf attachments supported</p>
+                <p class="invalid-feedback" *ngIf="addSectionItemModal.invalidFileUploaded && !newSectionItem.file">File required</p>
             </div>
         </form>
         </div>
@@ -82,7 +106,7 @@
             form="modelForm"
             class="btn btn-primary"
             (click)="onReset()"
-            [disabled]="loading"
+            [disabled]="addSectionItemModal.loading"
         >
             Reset
         </button>
@@ -91,11 +115,76 @@
             type="button"
             class="btn btn-secondary"
             data-bs-dismiss="modal"
-            [disabled]="loading"
+            [disabled]="addSectionItemModal.loading"
         >
             Cancel
         </button>
-        <button form="modelForm" type="submit" class="btn btn-success" [disabled]="loading">Add</button>
+        <button form="modelForm" type="submit" class="btn btn-success" [disabled]="addSectionItemModal.loading">Add</button>
+        </div>
+    </div>
+    </div>
+    </div>
+    
+    <!-- Edit Section Item Modal -->
+    <div
+    class="modal fade"
+    id="edit"
+    tabindex="-1"
+    aria-labelledby="enrollLabel"
+    aria-hidden="true"
+    >
+    <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+        <div class="modal-header">
+        <h5 class="modal-title" id="enrollLabel">Edit section item</h5>
+        <button
+            type="button"
+            class="btn-close"
+            data-bs-dismiss="modal"
+            aria-label="Close"
+        ></button>
+        </div>
+        <div class="modal-body">
+        <form  id="editFrom" #editForm="ngForm" (ngSubmit)="onEditSectionItemSubmit()">
+            <div class="mb-3">
+                <label
+                [class.text-danger]="invalidSectionItemTitle(activeSectionItem)"
+                >Section item title</label>
+                <input type="text" class="form-control" 
+                name="sectionItemTitle"
+                [class.is-invalid]="invalidSectionItemTitle(activeSectionItem)"
+                [(ngModel)]="activeSectionItem.sectionItemTitle">
+                <p class="invalid-feedback">Title required</p>
+            </div>
+            <div class="mb-3">
+                <video #editMoadlVideo id="modalVideo" 
+                    [src]="activeSectionItem.contentUrl" 
+                    class="mb-3" controls 
+                    [ngStyle]="{'display': activeSectionItem.type === 1 || !activeSectionItem.contentUrl? 'none' : ''}">
+                </video>
+
+                <a *ngIf="activeSectionItem.type === 1 && activeSectionItem.contentUrl"
+                    class="d-block mb-3"
+                    target="_blank"
+                     href="{{ activeSectionItem.contentUrl}}">Download file</a>
+
+                <input type="file" class="form-control" name="file"
+                    [(ngModel)]="OnlyNULL"
+                    (change)="onEditSectionItemFileSelected($event)">
+            </div>
+        </form>
+        </div>
+        <div class="modal-footer">
+        <button
+            #editCloseBtn
+            type="button"
+            class="btn btn-secondary"
+            data-bs-dismiss="modal"
+            [disabled]="editLoading"
+        >
+            Close
+        </button>
+        <button form="editFrom" type="submit" class="btn btn-primary" [disabled]="editLoading">Save Changes</button>
         </div>
     </div>
     </div>

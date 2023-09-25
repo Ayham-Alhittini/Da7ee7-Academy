@@ -1,0 +1,36 @@
+<div style="min-height: calc(100vh - 85px);">
+    <app-navbar></app-navbar>
+    <div class="enroll-body py-4">
+        <div class="container">
+            <div class="row px-3">
+                <div class="col-xl-5 col-md-12 enroll-card">
+                    <p class="title text-danger bold big">{{course.subject + ' | ' + course.major}}</p>
+                    <span class="teacher-name btn btn-link" style="text-decoration: none;font-size: 1.3em;">{{userService.getFirstAndLastName(teacher.user.fullName)}}</span>
+                    <hr>
+                    <span style="font-size: 1.2em;">إدخل البطاقة هنا</span>
+                    <form (ngSubmit)="onSubmit()" autocomplete="off">
+                        <input 
+                         name="cardNumber" [(ngModel)]="cardNumber" class="enroll-card-input" type="text" placeholder="أدخل باسورد البطاقة هنا">
+
+                         <p class="text-danger bold" *ngIf="submitted && cardNumber === '' && !error">أدخل رقم البطاقة</p>
+                         <p class="text-danger bold" *ngIf="error">{{error}}</p>
+                         
+                        <button type="submit" class="enroll-card-submit">سجل بالدورة الان</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="course-teacher">
+        <div class="container">
+            <h3 class="mt-4">معلم الدورة</h3>
+            <div class="img-container">
+                <img class="user-img" src="{{teacher.user.userPhotoUrl || './assets/user.png'}}" alt="teacher">
+                <strong class="big">{{userService.getFirstAndLastName(teacher.user.fullName)}}</strong>
+            </div>
+        </div>
+    </div>
+
+</div>
+<hr>

@@ -1,8 +1,8 @@
 <ng-container *ngIf="!loading">
-  <main>
+  <main class="admin-tabel-container">
     <ng-container *ngIf="courses.length > 0">
       <div style="overflow-y: scroll; max-height: 70vh;">
-          <table class="table">
+          <table class="table admin-tabel">
               <thead>
                 <tr>
                   <th scope="col">#</th>
@@ -37,9 +37,10 @@
       <p class="lead">No Courses Found</p>
     </ng-container>
     <button 
+        (click)="ResetModal()"
         data-bs-toggle="modal" data-bs-target="#enroll"
         title="add new course"
-        class="btn btn-success add-course-btn">
+        class="btn btn-success add-btn">
         <i class="fa-solid fa-plus"></i>
     </button>
 </main>
@@ -75,18 +76,25 @@ aria-hidden="true"
         </div>
         <div class="mb-3">
             <label>Subject</label>
-            <select class="form-select" name="subject" [(ngModel)]="modelData.subject">
+            <select class="form-select" 
+            name="subject" 
+            [(ngModel)]="modelData.subject" 
+            (change)="onSubjectChange($event)">
               <option *ngFor="let subject of subjects[modelData.major]"
                 value="{{subject}}">{{subject}}</option>
             </select>
         </div>
         <div class="mb-3">
             <label>Teacher</label>
-            <select class="form-select" name="teacherId" [(ngModel)]="modelData.teacherId">
+            <select 
+            class="form-select" 
+            [class.is-invalid]="submitted && !teachers.length"
+            name="teacherId" 
+            [(ngModel)]="modelData.teacherId">
               <option *ngFor="let teacher of teachers" 
-              value="{{teacher.id}}">{{teacher.fullName}}</option>
-
+              value="{{teacher.id}}">{{teacher.user.fullName}}</option>
               </select>
+            <p class="invalid-feedback" *ngIf="submitted && !teachers.length">Subject required</p>
         </div>
         <div class="mb-3">
             <div class="mb-3">
@@ -96,9 +104,10 @@ aria-hidden="true"
                 name="courseCover"
                 accept="image/*"
                 class="form-control" 
+                [(ngModel)]="onlyNull"
                 [class.is-invalid]="submitted && modelData.courseCover === null || invalidUploadFile" 
                 type="file" id="formFile">
-                <p class="invalid-feedback" *ngIf="modelData.courseCover === null">course cover required</p>
+                <p class="invalid-feedback" *ngIf="submitted && modelData.courseCover === null">course cover required</p>
                 <p class="invalid-feedback" *ngIf="invalidUploadFile">only accept images for course cover</p>
             </div>
         </div>
@@ -106,13 +115,15 @@ aria-hidden="true"
     </div>
     <div class="modal-footer">
       <button
+        #closeBtn
         type="button"
         class="btn btn-secondary"
         data-bs-dismiss="modal"
       >
         Cancel
       </button>
-      <button form="modelForm" type="submit" class="btn btn-success">Add</button>
+      <button 
+      form="modelForm" type="submit" class="btn btn-success">Add</button>
     </div>
   </div>
 </div>

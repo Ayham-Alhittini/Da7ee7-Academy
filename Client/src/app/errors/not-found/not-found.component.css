@@ -1,0 +1,45 @@
+
+* {
+    padding: 0;
+    margin: 0;
+}
+main {
+    height: 100vh;
+    background: linear-gradient(-45deg,#fb513e,#e64938);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    color: #000;
+    padding-bottom: 10vh;
+}
+
+img {
+    margin-bottom: -50px;
+}
+
+h1 {
+    font-weight: bolder;
+    font-size: 9em;
+}
+p {
+    font-weight: 600;
+}
+
+button:hover {
+    transform: translateY(-13px);
+    box-shadow: 0 35px 90px 4px rgba(0,0,0,.3), inset 0 0 0 3px #000;
+}
+button {
+    background: #3643ac;
+    color: #f34e3c;
+    font-size: 30px;
+    text-decoration: none;
+    margin: 2em auto 0;
+    padding: 0.3em 2em;
+    border-radius: 500px;
+    box-shadow: 0 20px 70px 4px rgba(0,0,0,.1), inset 7px 33px 0 0 #3643ac;
+    font-weight: 900;
+    transition: all .3s ease;
+    border: none;
+}

@@ -20,16 +20,28 @@ import { AdminComponent } from './admin/admin.component';
 import { SideBarComponent } from './admin/side-bar/side-bar.component';
 import { DashboardComponent } from './admin/dashboard/dashboard.component';
 import { CoursesComponent } from './admin/courses/courses.component';
-import { ModeratorsComponent } from './admin/moderators/moderators.component';
 import { TeachersComponent } from './admin/teachers/teachers.component';
 import { StudentsComponent } from './admin/students/students.component';
-import { BlogsComponent } from './admin/blogs/blogs.component';
-import { SalePointsComponent } from './admin/sale-points/sale-points.component';
 import { CourseComponent } from './course/course.component';
 import { CourseNavComponent } from './course/course-nav/course-nav.component';
 import { CourseVideoComponent } from './course/course-video/course-video.component';
 import { CoursesManagementComponent } from './admin/courses-management/courses-management.component';
 import { SectionComponent } from './admin/courses-management/section/section.component';
+import { NotFoundComponent } from './errors/not-found/not-found.component';
+import { CoursesViewComponent } from './courses-view/courses-view.component';
+import { TeachersViewComponent } from './teachers-view/teachers-view.component';
+import { BlogsViewComponent } from './blogs-view/blogs-view.component';
+import { SalePointsViewComponent } from './sale-points-view/sale-points-view.component';
+import { CoursesListComponent } from './courses-view/courses-list/courses-list.component';
+import { TeacherProfileComponent } from './teachers-view/teacher-profile/teacher-profile.component';
+import { BlogDetailsComponent } from './blogs-view/blog-details/blog-details.component';
+import { ForbiddenComponent } from './errors/forbidden/forbidden.component';
+import { EnrollInCourseComponent } from './course/enroll-in-course/enroll-in-course.component';
+import { CourseContentComponent } from './course/course-content/course-content.component';
+import { MyCoursesComponent } from './courses-view/my-courses/my-courses.component';
+import { SettingsComponent } from './settings/settings.component';
+import { PersonalInformationComponent } from './settings/personal-information/personal-information.component';
+import { PrivacyComponent } from './settings/privacy/privacy.component';
 
 @NgModule({
   declarations: [
@@ -45,16 +57,28 @@ import { SectionComponent } from './admin/courses-management/section/section.com
     SideBarComponent,
     DashboardComponent,
     CoursesComponent,
-    ModeratorsComponent,
     TeachersComponent,
     StudentsComponent,
-    BlogsComponent,
-    SalePointsComponent,
     CourseComponent,
     CourseNavComponent,
     CourseVideoComponent,
     CoursesManagementComponent,
-    SectionComponent
+    SectionComponent,
+    NotFoundComponent,
+    CoursesViewComponent,
+    TeachersViewComponent,
+    BlogsViewComponent,
+    SalePointsViewComponent,
+    CoursesListComponent,
+    TeacherProfileComponent,
+    BlogDetailsComponent,
+    ForbiddenComponent,
+    EnrollInCourseComponent,
+    CourseContentComponent,
+    MyCoursesComponent,
+    SettingsComponent,
+    PersonalInformationComponent,
+    PrivacyComponent
   ],
   imports: [
     BrowserModule,

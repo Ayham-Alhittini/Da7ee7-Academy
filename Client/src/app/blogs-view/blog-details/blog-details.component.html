@@ -1,0 +1,16 @@
+<app-navbar></app-navbar>
+<div class="container">
+    <div class="row justify-content-center">
+        <div class="col-xl-8 col-md-10 col-sm-12 blog pt-3 pb-5 mt-4" *ngIf="blog">
+            <h3>{{blog.title}}</h3>
+            <span class="d-block mb-3">
+                <i class="fa fa-clock ms-2" aria-hidden="true"></i>
+                <span class="text-muted">{{blog.createdDate | date: 'yyyy/MM/dd'}}</span>
+            </span>
+            <img class="w-100 mb-5" src="{{blog.photoUrl}}" alt="">
+            <p [innerHTML]="blog.content" class="lead"></p>      
+        </div>
+    </div>
+    
+    <hr>
+</div>

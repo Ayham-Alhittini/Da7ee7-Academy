@@ -1,0 +1,12 @@
+.personal-info {
+    box-shadow: 0 0 10px 0 rgba(0,0,0,.1);   
+    padding: 50px;
+}
+.save-btn {
+    background-color: #214faa;
+
+}
+
+.save-btn:hover {
+    opacity: 0.5;
+}

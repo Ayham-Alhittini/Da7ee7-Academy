@@ -20,7 +20,9 @@ namespace Da7ee7_Academy.Controllers
         private readonly ITokenService _tokenService;
         private readonly IWebHostEnvironment _env;
         private readonly DataContext _context;
+        private readonly IPhotoRepository _photoRepository;
         public AccountController(UserManager<AppUser> userManager, IEmailService emailService, ITokenService tokenService,
+            IPhotoRepository photoRepository,
             IWebHostEnvironment env, DataContext context)
         {
             _userManager = userManager;
@@ -28,6 +30,7 @@ namespace Da7ee7_Academy.Controllers
             _tokenService = tokenService;
             _env = env;
             _context = context;
+            _photoRepository = photoRepository;
         }
 
         [Authorize]
@@ -39,25 +42,21 @@ namespace Da7ee7_Academy.Controllers
 
         [Authorize(Roles = "Admin")]
         [HttpPost("teacher-register")]
-        public async Task<ResponseModel> TeacherRegister(TeacherRegisterDto teacherRegister)
+        public async Task<ActionResult> TeacherRegister([FromForm]TeacherRegisterDto teacherRegister)
         {
-            var response = new ResponseModel();
 
             if (await UserExist(teacherRegister.FullName, teacherRegister.Email, teacherRegister.PhoneNumber))
             {
-                response.StatusCode = 400;
-                response.Errors.Add("Teacher exist");
-                return response;
+                return BadRequest("Teacher exist");
+            }
+
+            if (!_photoRepository.CheckPhotoSended(teacherRegister.ImageFile))
+            {
+                return BadRequest("Only image allowed");
             }
 
             var FullNameParts = teacherRegister.FullName.Split(' ');
 
-            //if (FullNameParts.Length < 4)
-            //{
-            //    response.StatusCode = 400;
-            //    response.Errors.Add("Full name at least have 4 name");
-            //    return response;
-            //}
 
             ///adding user
             var user = new AppUser
@@ -77,17 +76,17 @@ namespace Da7ee7_Academy.Controllers
 
             if (!result.Succeeded)
             {
-                response.StatusCode = 400;
-                response.Errors.AddRange(result.Errors.Select(e => e.Description));
-                return response;
+                var errors = new List<string>();
+                errors.AddRange(result.Errors.Select(e => e.Description));
+                return BadRequest(errors);
             }
 
             var roleResult = await _userManager.AddToRoleAsync(user, RolesSrc.Teacher);
             if (!roleResult.Succeeded)
             {
-                response.StatusCode = 400;
-                response.Errors.AddRange(result.Errors.Select(e => e.Description));
-                return response;
+                var errors = new List<string>();
+                errors.AddRange(roleResult.Errors.Select(e => e.Description));
+                return BadRequest(errors);
             }
 
             ///add the teacher entity
@@ -99,6 +98,15 @@ namespace Da7ee7_Academy.Controllers
             };
 
             _context.Teachers.Add(teacher);
+
+            ///add the user photo
+
+            var file = await _photoRepository.SavePhotoAsync(teacherRegister.ImageFile, @"Uploads\Users_Picture");
+
+            user.FileId = file.Id;
+            user.UserPhotoUrl = _env.GetUrlRoot() + Url.Action("GetImages", "Files", new { photoId = file.Id });
+
+            //save changes
             await _context.SaveChangesAsync();
 
 
@@ -106,9 +114,7 @@ namespace Da7ee7_Academy.Controllers
                 $"The admin have been create your account as a teacher in Da7ee7 Academy \nEmail: {user.Email}\nPassword: {generatedPassword}");///need to be edited to take us to front end page
             _emailService.SendEmail(message);
 
-            response.IsSuccess = true;
-            response.Message = "Teacher added successfuly";
-            return response;
+            return Ok();
         }
 
         [AllowAnonymous]
@@ -134,15 +140,6 @@ namespace Da7ee7_Academy.Controllers
                 FirstName = FullNameParts.First(),
             };
 
-            ///store the photo if any
-            //var photo = registerStudent.UserImage;
-            //if (CheckPhotoSended(photo))
-            //{
-            //    var file = await SavePhoto(photo);
-            //    user.FileId = file.Id;
-            //    user.UserPhotoUrl = GetUrlRoot() + Url.Action("GetImages", "Files", new { photoId = file.Id });
-            //}
-
             var result = await _userManager.CreateAsync(user, registerStudent.Password);
 
             if (!result.Succeeded)
@@ -159,7 +156,8 @@ namespace Da7ee7_Academy.Controllers
             ///add the student entity as well
             var student = new Student
             {
-                Id = user.Id
+                Id = user.Id,
+                Gender = "ذكر",
             };
 
             _context.Students.Add(student);
@@ -169,7 +167,7 @@ namespace Da7ee7_Academy.Controllers
             ///send email to confirm the email
             var token = await _userManager.GenerateEmailConfirmationTokenAsync(user);
             var confirmationLink = Url.Action(nameof(ConfirmEmail), "Account", new { token, email = user.Email });
-            var message = new EmailMessage(new string[] { user.Email! }, "Confirmation email link", GetUrlRoot() + confirmationLink!);///need to be edited to take us to front end page
+            var message = new EmailMessage(new string[] { user.Email! }, "Confirmation email link", _env.GetUrlRoot() + confirmationLink!);///need to be edited to take us to front end page
             _emailService.SendEmail(message);
 
             return Ok();
@@ -180,7 +178,7 @@ namespace Da7ee7_Academy.Controllers
         public async Task<ResponseModel> ChangePhoto([Required] IFormFile photo)
         {
             var response = new ResponseModel();
-            if (!CheckPhotoSended(photo))
+            if (!_photoRepository.CheckPhotoSended(photo))
             {
                 response.StatusCode = 400;
                 response.Errors.Add("only image allowed");
@@ -191,16 +189,16 @@ namespace Da7ee7_Academy.Controllers
             var user = await _context.Users.Include(u => u.File)
                 .FirstOrDefaultAsync(u => u.Id == User.GetUserId());
 
-            var file = await SavePhoto(photo);
+            var file = await _photoRepository.SavePhotoAsync(photo, @"Uploads\Users_Picture");
 
             var oldFile = user.File;
 
             user.FileId = file.Id;
-            user.UserPhotoUrl = GetUrlRoot() + Url.Action("GetUserPicture", "Files", new { photoId = file.Id });
+            user.UserPhotoUrl = _env.GetUrlRoot() + Url.Action("GetImages", "Files", new { photoId = file.Id });
 
             if (oldFile != null) 
             {
-                DeletePhoto(oldFile);
+                _photoRepository.DeletePhoto(oldFile);
             }
 
             await _context.SaveChangesAsync();
@@ -211,27 +209,46 @@ namespace Da7ee7_Academy.Controllers
             return response;
         }
 
-        [Authorize]
-        [HttpPost("update-phone-number")]
-        public async Task<ResponseModel> UpdatePhoneNumber([Required]string phoneNumber)
+        [Authorize(Roles ="Student")]
+        [HttpGet("get-profile")]
+        public async Task<ActionResult> GetProfile()
         {
-            var response = new ResponseModel();
-            var user = await _context.Users.FindAsync(User.GetUserId());
-            
-            if (await UserExist(user.FullName, user.Email, phoneNumber))
+            var student = await _context.Students
+            .Include(u => u.AppUser)
+            .FirstOrDefaultAsync(u => u.Id == User.GetUserId());
+            var userDto = new UserDto
             {
-                response.StatusCode = 400;
-                response.Errors.Add("Phone number is exist");
-                return response;
+                Email = student.AppUser.Email,
+                FirstName = student.AppUser.FirstName,
+                FullName = student.AppUser.FullName,
+                Gender = student.Gender,
+                PhoneNumber = student.AppUser.PhoneNumber,
+                Role = student.AppUser.Role,
+                UserId = student.Id,
+            };
+            return Ok(userDto);
+        }
+
+        [Authorize]
+        [HttpPost("update-profile")]
+        public async Task<ActionResult> UpdatePhoneNumber(ChangeProfileDto profile)
+        {
+            if (!User.IsInRole("Student"))
+            {
+                return Forbid();
             }
 
-            user.PhoneNumber = phoneNumber;
+            var user = await _context.Users.FindAsync(User.GetUserId());
+
+            user.PhoneNumber = profile.PhoneNumber;
+
+            var student = await _context.Students.FindAsync(User.GetUserId());
+
+            student.Gender = profile.Gender;
+
             await _context.SaveChangesAsync();
 
-
-            response.IsSuccess = true;
-            response.Message = "Phone number updated successfuly";
-            return response;
+            return Ok();
         }
 
         [AllowAnonymous]
@@ -284,11 +301,28 @@ namespace Da7ee7_Academy.Controllers
                 return Unauthorized("Invalid password");
             }
 
+            string gender = null;
+            if (user.Role != "Admin")
+            {
+                if (user.Role == "Student") {
+                    var student = await _context.Students.FindAsync(user.Id);
+                    gender = student.Gender;
+                } else {
+                    var teacher = await _context.Teachers.FindAsync(user.Id);
+                    gender = teacher.Gender;
+                }
+            }
+
             UserDto userDto = new UserDto
             {
                 UserId = user.Id,
                 FirstName = user.FirstName,
-                Token = await _tokenService.CreateToken(user)
+                Token = await _tokenService.CreateToken(user),
+                Role = user.Role,
+                FullName = user.FullName,
+                Email = user.Email,
+                PhoneNumber = user.PhoneNumber,
+                Gender = gender,
             };
 
             return Ok(userDto);
@@ -308,7 +342,7 @@ namespace Da7ee7_Academy.Controllers
             }
             var token = await _userManager.GeneratePasswordResetTokenAsync(user);
 
-            var forgotPasswordLink = GetUrlRoot() + "/reset-password?token=" + HttpUtility.UrlEncode(token) + "&email=" + email;///take us to the front end page
+            var forgotPasswordLink = _env.GetUrlRoot() + "/reset-password?token=" + HttpUtility.UrlEncode(token) + "&email=" + email;///take us to the front end page
 
             var message = new EmailMessage(new string[] { user.Email! }, "Password Reset link", forgotPasswordLink);
             _emailService.SendEmail(message);
@@ -348,24 +382,23 @@ namespace Da7ee7_Academy.Controllers
         public async Task<ResponseModel> ChangePassword(ChangePasswordDto changePassword)
         {
             var response = new ResponseModel();
-            var user = await _userManager.FindByEmailAsync(changePassword.Email);
-            if (user == null)
-            {
-                response.StatusCode = 404;
-                response.Errors.Add("User not found");
-                return response;
-            }
-            if (changePassword.OldPassword == changePassword.NewPassword)
-            {
-                response.StatusCode = 400;
-                response.Errors.Add("New password must be different than old password");
-                return response;
-            }
+            var user = await _userManager.FindByIdAsync(User.GetUserId());
+
+            
             var changePasswordResult = await _userManager.ChangePasswordAsync(user, changePassword.OldPassword, changePassword.NewPassword);
             if (!changePasswordResult.Succeeded)
             {
                 response.StatusCode = 400;
-                response.Errors.AddRange(changePasswordResult.Errors.Select(e => e.Description));
+                
+                if (changePasswordResult.Errors.Any(e => e.Code == "PasswordMismatch"))
+                {
+                    response.Errors.Add("كلمة المرور غير صحيحة");
+                }
+                else
+                {
+                    response.Errors.Add("كلمة المرور الجديدة ضعيفة");
+                }
+                
                 return response;
             }
 
@@ -375,49 +408,11 @@ namespace Da7ee7_Academy.Controllers
         }
 
         //Private Methods
-        private void DeletePhoto(AppFile file)
-        {
-            _context.Files.Remove(file);///Remove from database
-
-            var filePath = Path.Combine(Directory.GetCurrentDirectory(), file.Path, file.FileName);
-            System.IO.File.Delete(filePath);//Remove from folder
-        }
-        private async Task<AppFile> SavePhoto(IFormFile photo)
-        {
-            var file = new AppFile
-            {
-                ContentType = photo.ContentType,
-                Path = @"Uploads\Users_Picture"
-            };
-
-            var extension = photo.FileName.Split('.').LastOrDefault();
-
-            file.FileName = file.Id + "." + extension;
-
-            var filePath = Path.Combine(Directory.GetCurrentDirectory(), file.Path, file.FileName);
-
-            using (var stream = new FileStream(filePath, FileMode.Create))
-            {
-                await photo.CopyToAsync(stream);
-            }
-
-            _context.Files.Add(file);
-
-            return file;
-        }
-        private bool CheckPhotoSended(IFormFile image)
-        {
-            return image != null && image.Length > 0 && image.ContentType.Contains("image");
-        }
         private async Task<bool> UserExist(string fullName, string email, string phoneNumber)
         {
             return await _userManager.Users.AnyAsync(user => user.FullName == fullName 
                                                           || user.Email == email
                                                           || user.PhoneNumber == phoneNumber);
-        }
-        private string GetUrlRoot()
-        {
-            return _env.IsDevelopment() ? "https://localhost:7124" : "production url";
         }
     }
 }

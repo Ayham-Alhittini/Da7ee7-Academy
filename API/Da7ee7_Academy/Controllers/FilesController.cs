@@ -1,4 +1,5 @@
 ﻿using Da7ee7_Academy.Data;
+using Da7ee7_Academy.Extensions;
 using Da7ee7_Academy.Helper;
 using Microsoft.AspNetCore.Mvc;
 
@@ -7,10 +8,15 @@ namespace Da7ee7_Academy.Controllers
     public class FilesController: BaseApiController
     {
         private readonly DataContext _context;
-        public FilesController(DataContext context)
+        private readonly IWebHostEnvironment _env;
+        public FilesController(DataContext context, IWebHostEnvironment env)
         {
             _context = context;
+            _env = env;
         }
+
+        /////////////////*************************///////////////
+        ////////////////  Be careful before change the method name consider that it's used to access the method /////////////////
 
         [HttpGet("images/{photoId}")]
         public async Task<IActionResult> GetImages(string photoId)
@@ -33,21 +39,21 @@ namespace Da7ee7_Academy.Controllers
             return File(fileBytes, file.ContentType);
         }
 
-        
-        ///we seprate it from GetImages because we will add validation to it later
+
+        ///While request can't came from unauthorized website we don't need to make it auth and check if student enroll in course
+        ///because that guaranteed from the website
         [HttpGet("get-file/{fileId}")]
         public async Task<IActionResult> GetFile(string fileId)
         {
-            //string referrer = Request.Headers["Referer"].ToString();
+            string referrer = Request.Headers["Referer"].ToString();
 
-            //if (referrer != "")
-            //{
-            //    return Ok(new ResponseModel
-            //    {
-            //        StatusCode = 401,
-            //        Errors = new List<string> { "Access the video only from the website" }
-            //    });
-            //}
+            if (!referrer.StartsWith("https://localhost:4200/") && !referrer.StartsWith(_env.GetUrlRoot()))
+            {
+                return Ok(new
+                {
+                    Error = "Access only allowed from website"
+                });
+            }
 
             var file = await _context.Files.FindAsync(fileId);
 

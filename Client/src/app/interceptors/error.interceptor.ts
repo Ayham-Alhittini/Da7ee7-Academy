@@ -18,6 +18,7 @@ export class ErrorInterceptor implements HttpInterceptor {
   intercept(request: HttpRequest<unknown>, next: HttpHandler): Observable<HttpEvent<unknown>> {
     return next.handle(request).pipe(
       catchError((error : HttpErrorResponse) => {
+        const errorMsg = error.error;
         if (error) {
           switch(error.status)
           {
@@ -35,15 +36,18 @@ export class ErrorInterceptor implements HttpInterceptor {
               }
               break;
               case 401 :
-                this.toastr.error(error.error, error.status.toString());
+                this.router.navigateByUrl("/login");
+                if (error.error) {
+                  this.toastr.error(error.error, null, {
+                    positionClass: 'toast-bottom-center'
+                  });
+                }
                 break;
               case 404 :
-                this.toastr.error(error.error, error.status.toString());
-                this.router.navigateByUrl("/home");
+                this.toastr.error(errorMsg, "404");
                 break;
               case 500 :
-                const navigationExtras : NavigationExtras = {state : {error : error.error}};
-                // this.router.navigateByUrl("/server-error", navigationExtras);
+                this.router.navigateByUrl("/server-error");
                 break;
               default :
                 this.toastr.error("Something Unexpected went wrong");

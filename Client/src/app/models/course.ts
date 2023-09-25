@@ -6,5 +6,6 @@ export interface Course {
     teacherId: string;
     major: string;
     coursePhotoUrl: string;
+    isEnrolled: boolean;
     sections: Section[];
 }

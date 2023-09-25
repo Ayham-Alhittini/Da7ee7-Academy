@@ -1,12 +1,22 @@
 <nav class="navbar" style="background: linear-gradient(90deg,#2c5364,#203a43,#0f2027);">
     <div class="container-fluid">
-      <div class="d-flex align-items-center justify-content-center">
-        <a routerLink="/" class="navbar-brand mx-0 nuxt-link-exact-active nuxt-link-active ms-3">
+
+      <div class="d-flex w-100 justify-content-between">
+        <div class="d-flex">
+          <a routerLink="/" class="navbar-brand mx-0 nuxt-link-exact-active nuxt-link-active ms-3">
             <span class="ms-1">Da7ee7 Academy</span>
             <i class="fa-solid fa-graduation-cap"></i>
-        </a>
+          </a>
+          <p class="text-light course-subject">{{Subject}}</p>
+        </div>
         
-        <p class="text-light">{{Subject}}</p>
+        <div class="menu">
+          <button class="btn btn-light px-3 py-2 bold d-flex align-items-center" (click)="onMenuClick()">
+            <i class="fa fa-bars ms-2" *ngIf="!expanded"></i>
+            <i class="fa-solid fa-xmark ms-2" *ngIf="expanded"></i>
+            <span>قائمة الحصص</span>
+          </button>
+        </div>
       </div>
     </div>
   </nav>

@@ -3,6 +3,9 @@ import { Course } from '../models/course';
 import { SectionItem } from '../models/sectionItem';
 import { ActivatedRoute, RouterOutlet } from '@angular/router';
 import { StudentService } from '../services/student.service';
+import { AccountService } from '../services/account.service';
+import { UserService } from '../services/user.service';
+import { Teacher } from '../models/teacher';
 
 @Component({
   selector: 'app-course',
@@ -11,80 +14,37 @@ import { StudentService } from '../services/student.service';
 })
 export class CourseComponent implements OnInit{
 
-  activeSectionItem: SectionItem = null;
-  opendSection: number = null;//if last watched lecture
-
-  constructor(private studentService: StudentService,private route: ActivatedRoute) {}
-  isOpen: boolean[] = [];
+  courseId = null;
   course: Course;
-  
-  ngOnInit(): void {
+  isEnrolled: boolean = null;
+  courseTeacher: Teacher = null;
+
+  constructor(private studentService: StudentService, 
+    private userService: UserService,
+    private route: ActivatedRoute) {
     const courseId = +this.route.params['_value'].id;
-    
-    this.studentService.getCourse(courseId).subscribe(result => {
+    this.courseId = courseId;
+  }
+
+  ngOnInit(): void {
+    this.loadCourse();
+  }
+
+  loadCourse() {
+    this.studentService.getCourse(this.courseId).subscribe(result => {
       this.course = result;
-      this.isOpen = Array(this.course.sections.length).fill(false)
-      console.log(this.course);
-      this.setLastWatched();
+
+      
+      if (result.isEnrolled) {
+        this.isEnrolled = true;
+      } else {
+        ///get the teacher that teach this course
+        const teacherId = result.teacherId;
+        this.userService.getSingleTeacher(teacherId).subscribe(teacher => {
+          this.courseTeacher = teacher;
+          this.isEnrolled = false;
+        });
+      }
     })
-  }
-
-  toggleAccordion(event: any, index: number) {
-    this.isOpen[index] = event;
-  }
-
-  getTime(timeInSeconds: number): string {
-    const hours = Math.floor(timeInSeconds / 3600);
-    timeInSeconds %= 3600;
-
-    const mintues = Math.floor(timeInSeconds / 60);
-    timeInSeconds %= 60;
-
-    const seconds = timeInSeconds;
-
-
-    let result = '';
-
-    if (hours > 0) {
-      result += (hours < 10 ? '0' : '') + hours + ':';
-    }
-
-    result += (mintues < 10 ? '0' : '') + mintues + ':';
-
-    result += (seconds < 10 ? '0' : '') + seconds;
-    return result;
-  }
-
-  sectionItemClick(data: SectionItem) {
-    if (data?.type == 2) {
-      this.activeSectionItem = data;
-      this.activeSectionItem.watchedDate = new Date();
-      this.studentService.markLectureAsWatched(data.id).subscribe();
-    }
-  }
-
-  setLastWatched() {
-    let lastWatched = null;
-    let _opendSection = null;
-    this.course.sections.forEach(section => {
-      section.sectionItems.forEach(sectionItem => {
-        if (sectionItem.watchedDate !== null) {
-          if (lastWatched === null) {
-            lastWatched = sectionItem;
-            _opendSection = section.id;
-          } else {
-            if (sectionItem.watchedDate > lastWatched.watchedDate) {
-              lastWatched = sectionItem;
-              _opendSection = section.id;
-            }
-          }
-        }
-      });
-    });
-
-    if (lastWatched) {
-      this.activeSectionItem = lastWatched;
-      this.opendSection = _opendSection;
-    }
   }
 }

@@ -1,24 +1,35 @@
 ﻿using Da7ee7_Academy.Data;
 using Da7ee7_Academy.Extensions;
-using Microsoft.AspNetCore.Authorization;
+using Da7ee7_Academy.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 namespace Da7ee7_Academy.Controllers
 {
     public class TestContoller: BaseApiController
     {
         private readonly DataContext _context;
-        public TestContoller(DataContext context)
+        private readonly IPhotoRepository _photoRepository;
+        private readonly IWebHostEnvironment _env;
+        public TestContoller(DataContext context, IPhotoRepository photoRepository, IWebHostEnvironment env)
         {
             _context = context;
+            _photoRepository = photoRepository;
+            _env = env;
         }
 
         [HttpGet]
-        public IActionResult Test(int courseId)
+        public IActionResult Test()
         {
-            Dictionary<int, bool> watched = new Dictionary<int, bool> { { 1, true }, { 2, true }, { 3, true } };
+            string referrer = Request.Headers["Referer"].ToString();
 
+            if (!referrer.StartsWith(_env.GetUrlRoot()))
+            {
+                return Ok(new
+                {
+                    Error = "Access video content only from website"
+                });
+            }
 
-            return Ok(watched.ContainsKey(courseId));
+            return Ok(referrer);
         }
     }
 }

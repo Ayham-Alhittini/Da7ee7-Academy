@@ -1,5 +1,7 @@
+import { CdkDragDrop, moveItemInArray } from '@angular/cdk/drag-drop';
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
+import { ToastrService } from 'ngx-toastr';
 import { ManageCoursesService } from 'src/app/services/manage-courses.service';
 
 @Component({
@@ -10,10 +12,14 @@ import { ManageCoursesService } from 'src/app/services/manage-courses.service';
 export class CoursesManagementComponent implements OnInit{
 
   constructor(private route: ActivatedRoute, 
-    private manageCourseService: ManageCoursesService) {}
+    private manageCourseService: ManageCoursesService, 
+    private toaster: ToastrService) {}
   courseId = null;
   sections: {id: number, sectionTitle: string, orderNumber: number}[]  = [];
   _newSection = null;
+  orderChanged = false;
+
+
   ngOnInit(): void {
     const courseId = +this.route.params['_value'].id;
     this.courseId = courseId;
@@ -35,5 +41,34 @@ export class CoursesManagementComponent implements OnInit{
       })
     }
     this._newSection = null;
+  }
+
+  onSaveOrderChanges() {
+    const newOrder = {
+      CourseId: this.courseId,
+      SectionIds : []
+    };
+
+    this.sections.forEach(section => {
+      newOrder.SectionIds.push(section.id);
+    });
+
+    
+    this.manageCourseService.editSectionsOrder(newOrder).subscribe({
+      next: () => {
+        this.orderChanged = false;
+        this.toaster.show("Changes Updated", null, {
+          positionClass: 'toast-bottom-center'
+        });
+      }, 
+      error : err => {
+        console.log(err);
+      }
+    })
+  }
+
+  drop(event: CdkDragDrop<string[]>) {
+    this.orderChanged = true;
+    moveItemInArray(this.sections, event.previousIndex, event.currentIndex);
   }
 }

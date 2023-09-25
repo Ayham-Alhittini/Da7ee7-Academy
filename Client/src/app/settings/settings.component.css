@@ -1,0 +1,12 @@
+.settings-btn {
+    padding: 13px 16px;
+    font-size: 1.2em;
+    border: none;
+    background-color: transparent;
+}
+
+.active-settings-btn {
+    color: #fb513e;
+    background-color: rgba(251,81,62,.1);
+    border-radius: 5px;
+}

@@ -1,0 +1,30 @@
+<app-navbar></app-navbar>
+<div class="container">
+    <p class="lead text-danger major-title">{{major}}</p>
+    <div class="row mb-5">
+        <select class="da-select ms-5 me-3" name="subject-list" (change)="onSubjectChange($event)">
+            <option value="none" selected>جميع المواد</option>
+            <option *ngFor="let subject of subjects" value="{{subject}}" >{{subject}}</option>
+        </select>
+
+        <select class="da-select" (change)="onTeacherChange($event)">
+            <option value="none" selected>جميع الاساتذة</option>
+            <option *ngFor="let teacher of teachers" value="{{teacher.id}}">{{teacher.user.fullName}}</option>
+        </select>
+    </div>
+
+    <div class="row">
+        <div *ngFor="let course of courses" routerLink="{{'/course/' + course.id}}" class="card course-card" style="width: 18rem;">
+            <img src="{{course.coursePhotoUrl}}" class="card-img-top" style="height: 156px;" alt="...">
+            <div class="card-body">
+                <p class="card-text course-major">{{major}}</p>
+            <h5 class="card-title mb-3">{{course.subject}}</h5>
+            <div class="d-flex align-items-center course-card-teacher">
+                <img src="{{getTeacher(course.teacherId)?.userPhotoUrl || './assets/user.png'}}" alt="...">
+                <p class="card-text">{{getTeacher(course.teacherId)?.fullName}}</p>
+            </div>
+            </div>
+        </div>
+    </div>
+    <h3 *ngIf="!courses.length && !loading" class="no-corses">عذراً لا يوجد دورات حسب المطلوب</h3>
+</div>

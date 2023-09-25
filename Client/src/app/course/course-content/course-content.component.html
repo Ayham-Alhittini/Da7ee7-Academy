@@ -1,0 +1,51 @@
+<div id="course-content">
+    <app-course-nav [subject]="course?.subject" (menuToggle)="menuToggle()" [expanded]="isExpanded"></app-course-nav>
+    <div class="row">
+      <div class="col-xl-3 col-md-12" [class.hide]="!isExpanded">
+        <accordion [isAnimated]="true">
+    
+          <accordion-group 
+          *ngFor="let section of course?.sections; let index = index"
+          (isOpenChange)="toggleAccordion($event, index)"
+          [isOpen]="section.id === opendSection"
+          [isDisabled]="section.sectionItems.length === 0"
+          [ngStyle]="{color: section.sectionItems.length === 0 ? 'lightgray' : ''}"
+          >
+            <span accordion-heading class="d-flex align-items-center">
+              <div class="ms-auto">
+                <h5 class="pe-2 py-2">{{section.sectionTitle}}</h5>
+                <p>{{section.sectionItems.length}} حصة | {{getTime(section.totalSectionTime)}}</p>
+              </div>
+              <i class="fa-solid fa-angle-{{isOpen[index] ? 'up' : 'down'}} fa-xl"></i>
+            </span>
+            <div 
+              *ngFor="let sectionItem of section.sectionItems"
+                class="section-item"
+                [class.da-active]="sectionItem.id === activeSectionItem?.id"
+                (click)="sectionItemClick(sectionItem)">
+              <div>
+                <div *ngIf="sectionItem.type === 2">
+                  <span *ngIf="!sectionItem.watchedDate" class="start-lecture"><i class="fa-solid fa-play"></i></span>
+                  <span *ngIf="sectionItem.watchedDate" class="watched-lecture"><i class="fa-solid fa-check"></i></span>
+                  <span>{{sectionItem.sectionItemTitle}}</span>
+                </div>
+                <div *ngIf="sectionItem.type === 1">
+                  <span class="start-lecture"><i class="fa-regular fa-file"></i></span>
+                  <a href="{{sectionItem.contentUrl}}">{{sectionItem.sectionItemTitle}}</a>
+    
+                </div>
+              </div>
+              <div *ngIf="sectionItem.type === 2"><!-- if it's a video -->
+                <i class="fa-regular fa-clock"></i>
+                <span class="me-2">{{getTime(sectionItem.videoLength)}}</span>
+              </div>
+            </div> 
+        </accordion-group>
+    
+       </accordion>
+      </div>
+      <div class="col-xl-9 col-md-12" [class.hide]="isExpanded">
+        <app-course-video *ngIf="activeSectionItem?.type === 2 || activeSectionItem === null" [src]="activeSectionItem?.contentUrl"></app-course-video>
+      </div>
+    </div>
+  </div>

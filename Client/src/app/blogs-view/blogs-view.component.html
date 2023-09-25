@@ -1,0 +1,98 @@
+<app-navbar></app-navbar>
+<div class="blog-head">
+    <div class="container">
+        <div class="head-container">
+            <i class="fa-solid fa-newspaper fa-2xl"></i>
+            <span>المدونات</span>
+        </div>
+    </div>
+</div>
+<div class="blog-body">
+    <div class="container">
+        <div class="row">
+            <div class="col-xl-8 col-md-12">
+                <form (ngSubmit)="searchFilter()" class="my-4 d-flex blog-search">
+                    <input name="searchText" [(ngModel)]="searchText" type="search" class="form-control" placeholder="ابحث عن مدونة">
+                    <button type="submit"><i class="fa fa-search" aria-hidden="true"></i></button>
+                </form>
+
+                <div class="cards-holder">
+                    <div *ngFor="let blog of blogs" class="blog-card mb-4" routerLink="{{'/blogs/' + blog.id}}">
+                        <div class="blog-img">
+                            <img src="{{blog.photoUrl}}" alt="blog img">
+                        </div>
+                        <div class="blog-details">
+                            <h4>{{blog.title}}</h4>
+                            <p>{{contentCut(blog.content)}}</p>
+                        </div>
+                        <button *ngIf="(accountService.loadedUser | async)?.role === 'Admin'"
+                        class="btn btn-danger" (click)="onDeleteBlog(blog.id)"><i class="fa fa-trash"></i></button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<button *ngIf="(accountService.loadedUser | async)?.role === 'Admin'"
+(click)="ResetForm()"
+data-bs-toggle="modal" data-bs-target="#addBlog"
+class="add-btn" style="background-color: #fb513e;color: #fff; border: none;"><i class="fa fa-plus"></i></button>
+
+
+<!-- Add new sale point modal -->
+<div class="da-en">
+    <div
+    class="modal fade"
+    id="addBlog"
+    tabindex="-1"
+    aria-hidden="true"
+    >
+    <div class="modal-dialog">
+    <div class="modal-content">
+        <div class="modal-header">
+        <h5 class="modal-title">Add new blog</h5>
+        <button
+            type="button"
+            class="btn-close"
+            data-bs-dismiss="modal"
+            aria-label="Close"
+        ></button>
+        </div>
+        <div class="modal-body">
+        <form [formGroup]="addBlogForm" (ngSubmit)="onAddBlogSubmit()" id="modelForm">
+            <div class="mb-3">
+                <label>Title</label>
+                <input [class.is-invalid]="addBlogForm.get('title').invalid && addBlogForm.get('title').touched"
+                type="text" class="form-control" formControlName="title">
+            </div>
+            <div class="mb-3">
+                <label>Content</label>
+                <textarea [class.is-invalid]="addBlogForm.get('content').invalid && addBlogForm.get('content').touched"
+                class="form-control" cols="30" rows="10" formControlName="content"></textarea>
+            </div>
+        </form>
+        <form>
+            <div class="mb-3">
+                <label>Cover photo</label>
+                <input [class.is-invalid]="invalidFile"
+                name="fileValue" [(ngModel)]="fileValue" type="file" class="form-control" (change)="onBlogPhotoSelected($event)">
+            </div>
+        </form>
+        </div>
+        <div class="modal-footer">
+        <button
+            #closeBtn
+            type="button"
+            class="btn btn-secondary"
+            data-bs-dismiss="modal"
+        >
+            Cancel
+        </button>
+        <button 
+        [disabled]="addBlogForm.invalid"
+        form="modelForm" type="submit" class="btn btn-success">Add</button>
+        </div>
+    </div>
+    </div>
+    </div>
+</div>

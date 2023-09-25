@@ -1,5 +1,48 @@
 <app-navbar></app-navbar>
+
 <img src="https://hisasonline.fra1.digitaloceanspaces.com/offer-2006.jpg" 
 alt="Nature" width="600" height="600"
  class="responsive" 
  style="width: 100%; height: auto; background-color: rgb(0, 31, 60);">
+
+ <div class="container">
+    <div class="home-body mb-5">
+        <h4 class="mt-4 mb-3" style="font-size: 1.8em;">من المدونة</h4>
+
+        <div class="row">
+            <div *ngFor="let blog of homeData?.blogs" class="col-xl-3 col-md-4 col-sm-6 mb-4 pointer" routerLink="{{'/blogs/' + blog.id}}">
+                <div class="blog-card">
+                    <div class="blog-card-img">
+                        <img class="w-100 h-100" src="{{blog.photoUrl}}" alt="">
+                    </div>
+                    <div class="blog-card-title">
+                        <p class="lead">{{blog.title}}</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="d-flex align-items-center justify-content-between">
+            <h4 class="mt-4 mb-3" style="font-size: 1.8em;">من الدورات</h4>
+            <button routerLink="/courses" class="all-courses">تصفح جميع الدورات</button>
+        </div>
+
+        <div class="row">
+            <div *ngFor="let course of homeData?.courses" class="col-xl-3 col-md-6 col-sm-12">
+                <div routerLink="{{'/course/' + course.id}}" class="card course-card" style="width: 18rem; margin: 0; margin-bottom: 20px;">
+                    <img src="{{course.coursePhotoUrl}}" class="card-img-top" style="height: 156px;" alt="...">
+                    <div class="card-body">
+                        <p class="card-text course-major">{{course.major}}</p>
+                    <h5 class="card-title mb-3">{{course.subject}}</h5>
+                    <div class="d-flex align-items-center course-card-teacher">
+                        <img src="{{getTeacher(course.teacherId)?.userPhotoUrl || './assets/user.png'}}" alt="...">
+                        <p class="card-text">{{getTeacher(course.teacherId)?.fullName}}</p>
+                    </div>
+                    </div>
+                </div>
+            </div>            
+        </div>
+
+    </div>
+</div>
+<hr>

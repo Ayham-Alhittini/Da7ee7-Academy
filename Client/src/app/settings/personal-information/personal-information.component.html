@@ -1,0 +1,30 @@
+<div class="personal-info">
+    <div class="row">
+        <div class="col-xl-3 col-md-6 col-sm-12">
+            <label class="mb-3">الاسم الكامل</label>
+            <input readonly style="cursor: not-allowed;" class="form-value" type="text" value="{{user?.fullName}}">
+        </div>
+    
+        <div class="col-xl-3 col-md-6 col-sm-12">
+            <label class="mb-3">البريد الالكتروني</label>
+            <input readonly style="cursor: not-allowed;" class="form-value" type="email" value="{{user?.email}}">
+        </div>
+    
+        <div class="col-xl-3 col-md-6 col-sm-12">
+            <label class="mb-3">رقم الموبايل</label>
+            <input class="form-value" type="text" [(ngModel)]="user.phoneNumber" name="phoneNumber">
+        </div>
+    
+        <div class="col-xl-3 col-md-6 col-sm-12">
+            <label class="mb-3 d-block">الجنس</label>
+            <select class="form-value" [(ngModel)]="user.gender" name="gender">
+                <option value="ذكر">ذكر</option>
+                <option value="انثى">انثى</option>
+            </select>
+        </div>
+    </div>
+
+    <div class="d-flex justify-content-center">
+        <button class="btn btn-primary mt-4 w-100 save-btn mb-3" (click)="submit()">حفظ</button>
+    </div>
+</div>

@@ -1,0 +1,15 @@
+<app-navbar></app-navbar>
+<div class="container">
+    <span class="d-block mt-4 mb-5 primary big">الاعدادات</span>
+    <div class="d-flex align-items-center justify-content-center mb-5">
+        <button class="settings-btn ms-5" routerLink="/settings" routerLinkActive="active-settings-btn" [routerLinkActiveOptions]="{ exact: true }">
+            <i class="fa-regular fa-user ms-2"></i>
+            <span class="bold">معلومات الحساب</span>
+        </button>
+        <button class="settings-btn" routerLink="/settings/privacy" routerLinkActive="active-settings-btn">
+            <i class="fa-solid fa-lock ms-2"></i>
+            <span class="bold">الخصوصية</span>
+        </button>
+    </div>
+    <router-outlet></router-outlet>
+</div>

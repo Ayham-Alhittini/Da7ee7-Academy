@@ -9,7 +9,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Da7ee7_Academy.Controllers
 {
-    [Authorize(Roles = "Student, Admin")]
+    [Authorize]
     public class StudentController: BaseApiController
     {
         private readonly DataContext _context;
@@ -20,9 +20,111 @@ namespace Da7ee7_Academy.Controllers
             _mapper = mapper;
         }
 
+        [HttpGet("my-courses")]
+        public async Task<ActionResult> MyCourses()
+        {
+            if (!User.IsInRole("Student"))
+            {
+                return Forbid("Access the enrollment is limited to student only, sorry admin ^-^");
+            }
+
+            var courses = await _context.Students_Courses
+                .Include(sc => sc.Course)
+                .Where(sc => sc.StudentId == User.GetUserId())
+                .Select(sc => sc.Course)
+                .ToListAsync();
+
+            var teachers = await _context.Teachers.ToListAsync();
+
+            return Ok(new 
+            {
+                courses = _mapper.Map<CourseDto[]>(courses),
+                teachers = _mapper.Map<TeacherDto[]>(teachers)
+            });
+        }
+
+        [HttpPost("enroll-in-course")]
+        public async Task<ActionResult> EnrollInCourse(CourseEnrollDto enrollDto)
+        {
+            if (!User.IsInRole("Student"))
+            {
+                return Forbid("Access the enrollment is limited to student only, sorry admin ^-^");
+            }
+
+            ///validate the card number
+
+            var cardNumber = await _context.Cards.FindAsync(enrollDto.CardNumber);
+            if (cardNumber == null)
+            {
+                return Ok(new
+                {
+                    error = "رقم البطاقة غير صحيح"
+                });///sended as ok because want to deal with the error on the form
+            }
+
+            ///check if card already taken
+            
+            if (cardNumber.StudentId != null)
+            {
+                return Ok(new
+                {
+                    error = "البطاقة مستعملة من قبل"
+                });
+            }
+            
+            ///mark the card as taken
+            cardNumber.StudentId = User.GetUserId();
+            cardNumber.CourseId = enrollDto.CourseId;
+
+            var course = await _context.Courses.FindAsync(enrollDto.CourseId);
+            
+            if (course == null)
+            {
+                return NotFound("Course not exist");
+            }
+
+            var studentCourse = new Student_Course
+            {
+                CourseId = course.Id,
+                StudentId = User.GetUserId(),
+                TeacherId = course.TeacherId
+            };
+
+            _context.Students_Courses.Add(studentCourse);
+
+            await _context.SaveChangesAsync();
+
+            string NULL = null;
+            return Ok(new
+            {
+                error = NULL
+            });
+        }
+
         [HttpGet("course/{id}")]
         public async Task<ActionResult> GetCourse(int id)
         {
+            var isEnrolled = await _context.Students_Courses
+                .AnyAsync(sc => sc.StudentId == User.GetUserId() && sc.CourseId == id) || User.IsInRole("Admin");
+
+            if (!isEnrolled)
+            {
+                ///return course informations without lectures and files
+                ///we seprated from down because the down one is fetch every thing about the course
+
+                var toEnrollCourse = await _context.Courses.FindAsync(id);
+
+                if (toEnrollCourse == null)
+                {
+                    return NotFound("Course not exist");
+                }
+
+                var toEnrollCourseDto = _mapper.Map<CourseDto>(toEnrollCourse);
+                toEnrollCourseDto.isEnrolled = false;
+                return Ok(toEnrollCourseDto);
+            }
+
+
             var course = await _context.Courses
                 .Include(course => course.Sections)
                 .ThenInclude(section => section.SectionItems)
@@ -32,6 +134,7 @@ namespace Da7ee7_Academy.Controllers
             {
                 return NotFound("Course not exist");
             }
+
 
             var watchedLst = await _context.WatchedLectures
                 .Where(wl => wl.CourseId == id && wl.StudentId == User.GetUserId())
@@ -95,6 +198,19 @@ namespace Da7ee7_Academy.Controllers
 
             await _context.SaveChangesAsync();
             return Ok();
+        }
+
+        [HttpGet("get-teachers")]
+        public async Task<ActionResult> GetTeachers()
+        {
+            var result = await _context.Teachers
+                .Select(teacher => new
+                {
+                    teacher.Id,
+                    teacher.Major,
+                })
+                .ToListAsync();
+            return Ok(result);
         }
     }
 }

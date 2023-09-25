@@ -1,0 +1,28 @@
+<form class="privacy" novalidate (ngSubmit)="onSumbit()">
+    <div class="row">
+        <h5>تغير كلمة السر</h5>
+    </div>
+
+    <div class="row">
+        <div class="col-xl-6 col-md-12">
+            <label class="mb-3">كلمة المرور الحالية</label>
+            <input name="oldPassword" [(ngModel)]="oldPassword" type="text" class="mb-3 form-value">
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-xl-6 col-md-12">
+            <label class="mb-3">كلمة المرور الجديدة</label>
+            <input name="newPassword" [(ngModel)]="newPassword" type="text" class="mb-3 form-value" placeholder="8 خانات على الاقل">
+        </div>
+
+    </div>
+
+    <div class="row">
+        <div class="col-xl-6 col-md-12">
+            <button type="submit" class="btn btn-primary mt-4 w-100 change-password-btn mb-3">تغير كلمة المرور</button>
+        </div>
+
+    </div>
+
+</form>

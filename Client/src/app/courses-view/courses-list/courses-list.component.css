@@ -1,0 +1,14 @@
+.da-select {
+    min-width: 20vw;
+    max-width: 25vw;
+    width: 100%;
+    padding: 10px;
+    background-color: #fff7f7;
+    border-radius: 10px;
+    font-size: 1.1em;
+    color: #023373;
+    /* cursor: pointer; */
+}
+.major-title {
+    padding: 5vh 0 2vh 0;
+}

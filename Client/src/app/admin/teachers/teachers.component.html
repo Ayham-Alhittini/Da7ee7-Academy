@@ -1,1 +1,134 @@
-<p>teachers works!</p>
+<ng-container *ngIf="!loading">
+    <main class="admin-tabel-container">
+      <ng-container *ngIf="true"> 
+        <div style="overflow-y: scroll; max-height: 70vh;">
+            <table class="table admin-tabel">
+                <thead>
+                  <tr>
+                    <th scope="col">#</th>
+                    <th scope="col">Image</th>
+                    <th scope="col">Full name</th>
+                    <th scope="col">Major</th>
+                    <th scope="col">Gender</th>
+                    <th scope="col">Email</th>
+                    <th scope="col">Phone number</th>
+                    <th scope="col">Courses count</th>
+                    <th scope="col">Total teached students</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr class="text-center align-items-center" *ngFor="let teacher of teachers">
+                    <td>{{teacher.id}}</td>
+                    <td><img class="user-img" src="{{teacher.userPhotoUrl || './assets/user.png'}}" alt="teacher image"></td>
+                    <td>{{teacher.fullName}}</td>
+                    <td>{{teacher.major}}</td>
+                    <td>{{teacher.gender}}</td>
+                    <td>{{teacher.email}}</td>
+                    <td>{{teacher.phoneNumber}}</td>
+                    <td>{{teacher.coursesCount}}</td>
+                    <td>{{teacher.totalTeachedStudents}}</td>
+                  </tr>
+                </tbody>
+              </table>
+        </div>
+      </ng-container>
+      <ng-container *ngIf="false">
+        <p class="lead">No Courses Found</p>
+      </ng-container>
+      <!-- (click)="ResetModal()" -->
+      <button 
+          (click)="initializeForm()"
+          data-bs-toggle="modal" data-bs-target="#enroll"
+          title="add new course"
+          class="btn btn-success add-btn">
+          <i class="fa-solid fa-plus"></i>
+      </button>
+  </main>
+  
+  <!-- Modal -->
+  <div
+  class="modal fade"
+  id="enroll"
+  tabindex="-1"
+  aria-labelledby="enrollLabel"
+  aria-hidden="true"
+  >
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="enrollLabel">Add new teacher</h5>
+        <button
+          type="button"
+          class="btn-close"
+          data-bs-dismiss="modal"
+          aria-label="Close"
+        ></button>
+      </div>
+      <div class="modal-body">
+        <form [formGroup]="addTeacherForm" (ngSubmit)="onSubmit()" id="modelForm">
+            
+            <div class="mb-3">
+                <label>Full name</label>
+                <input type="text" class="form-control" formControlName="fullName">
+            </div>
+
+            <div class="mb-3">
+                <label>Email</label>
+                <input type="email" class="form-control" formControlName="email">
+            </div>
+
+            <div class="mb-3">
+                <label>Phone number</label>
+                <input type="text" class="form-control" formControlName="phoneNumber">
+            </div>
+
+            <div class="mb-3">
+                <label>Major</label>
+                <select class="form-select" formControlName="major">
+                    <option value="رياضيات">رياضيات</option>
+                </select>
+            </div>
+
+            <div class="mb-3">
+                <label>Gender</label>
+                <select class="form-select" formControlName="gender">
+                    <option value="ذكر">ذكر</option>
+                    <option value="انثى">انثى</option>
+                </select>
+            </div>
+
+            <div class="mb-3">
+                <label>Teacher image</label>
+                <input accept="image/*" type="file" class="form-control"
+                #fileInput
+                (change)="onFileSelected($event)">
+            </div>
+
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button
+          (click)="onReset()"
+          type="button"
+          class="btn btn-primary"
+        >
+          Reset
+        </button>
+        <button
+          #closeBtn
+          type="button"
+          class="btn btn-secondary"
+          data-bs-dismiss="modal"
+        >
+          Cancel
+        </button>
+        <button 
+        form="modelForm" type="submit" class="btn btn-success" [disabled]="addTeacherForm.invalid || loading">Add</button>
+      </div>
+    </div>
+  </div>
+  </div>
+  </ng-container>
+  <ng-container *ngIf="loading">
+    Loading...
+  </ng-container>

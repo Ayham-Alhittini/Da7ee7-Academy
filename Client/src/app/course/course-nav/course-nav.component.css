@@ -5,3 +5,19 @@
 nav {
     padding: 20px;
 }
+.btn-light:focus {
+    box-shadow: none;
+    outline: none;
+}
+
+@media(min-width: 1200px) {
+    .menu {
+        display: none;
+    }
+}
+
+@media (max-width: 575px) {
+    .course-subject {
+        display: none;
+    }
+}

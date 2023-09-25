@@ -131,7 +131,7 @@ namespace Da7ee7_Academy.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<string>("AuthorId")
+                    b.Property<string>("AppFileId")
                         .HasColumnType("nvarchar(450)");
 
                     b.Property<string>("Content")
@@ -148,7 +148,7 @@ namespace Da7ee7_Academy.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("AuthorId");
+                    b.HasIndex("AppFileId");
 
                     b.ToTable("Blogs");
                 });
@@ -185,6 +185,24 @@ namespace Da7ee7_Academy.Migrations
                     b.ToTable("Courses");
                 });
 
+            modelBuilder.Entity("Da7ee7_Academy.Entities.CourseCard", b =>
+                {
+                    b.Property<string>("CardNumber")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<int>("CourseId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("StudentId")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.HasKey("CardNumber");
+
+                    b.HasIndex("StudentId");
+
+                    b.ToTable("Cards");
+                });
+
             modelBuilder.Entity("Da7ee7_Academy.Entities.SalePoint", b =>
                 {
                     b.Property<int>("Id")
@@ -197,6 +215,9 @@ namespace Da7ee7_Academy.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("AddressUrl")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Governorate")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Name")
@@ -307,9 +328,14 @@ namespace Da7ee7_Academy.Migrations
                     b.Property<int>("CourseId")
                         .HasColumnType("int");
 
+                    b.Property<string>("TeacherId")
+                        .HasColumnType("nvarchar(450)");
+
                     b.HasKey("StudentId", "CourseId");
 
                     b.HasIndex("CourseId");
+
+                    b.HasIndex("TeacherId");
 
                     b.ToTable("Students_Courses");
                 });
@@ -497,11 +523,11 @@ namespace Da7ee7_Academy.Migrations
 
             modelBuilder.Entity("Da7ee7_Academy.Entities.Blog", b =>
                 {
-                    b.HasOne("Da7ee7_Academy.Entities.AppUser", "Author")
+                    b.HasOne("Da7ee7_Academy.Entities.AppFile", "AppFile")
                         .WithMany()
-                        .HasForeignKey("AuthorId");
+                        .HasForeignKey("AppFileId");
 
-                    b.Navigation("Author");
+                    b.Navigation("AppFile");
                 });
 
             modelBuilder.Entity("Da7ee7_Academy.Entities.Course", b =>
@@ -517,6 +543,15 @@ namespace Da7ee7_Academy.Migrations
                     b.Navigation("File");
 
                     b.Navigation("Teacher");
+                });
+
+            modelBuilder.Entity("Da7ee7_Academy.Entities.CourseCard", b =>
+                {
+                    b.HasOne("Da7ee7_Academy.Entities.Student", "Student")
+                        .WithMany()
+                        .HasForeignKey("StudentId");
+
+                    b.Navigation("Student");
                 });
 
             modelBuilder.Entity("Da7ee7_Academy.Entities.Section", b =>
@@ -580,9 +615,15 @@ namespace Da7ee7_Academy.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
+                    b.HasOne("Da7ee7_Academy.Entities.Teacher", "Teacher")
+                        .WithMany("TeachedStudents")
+                        .HasForeignKey("TeacherId");
+
                     b.Navigation("Course");
 
                     b.Navigation("Student");
+
+                    b.Navigation("Teacher");
                 });
 
             modelBuilder.Entity("Da7ee7_Academy.Entities.Teacher", b =>
@@ -705,6 +746,8 @@ namespace Da7ee7_Academy.Migrations
             modelBuilder.Entity("Da7ee7_Academy.Entities.Teacher", b =>
                 {
                     b.Navigation("Courses");
+
+                    b.Navigation("TeachedStudents");
                 });
 #pragma warning restore 612, 618
         }
