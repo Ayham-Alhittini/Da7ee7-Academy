@@ -33,4 +33,8 @@ export class AdminService {
   deleteBlog(id: number) {
     return this.http.delete(this.baseUrl + '/delete-blog/' + id);
   }
+
+  generateCards(numberOfCards: number) {
+    return this.http.post(this.baseUrl + '/generate-cards/' + numberOfCards, null);
+  }
 }

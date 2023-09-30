@@ -101,7 +101,7 @@ namespace Da7ee7_Academy.Controllers
 
             ///add the user photo
 
-            var file = await _photoRepository.SavePhotoAsync(teacherRegister.ImageFile, @"Uploads\Users_Picture");
+            var file = await _photoRepository.SavePhotoAsync(teacherRegister.ImageFile, @"wwwroot\Uploads\Users_Picture");
 
             user.FileId = file.Id;
             user.UserPhotoUrl = _env.GetUrlRoot() + Url.Action("GetImages", "Files", new { photoId = file.Id });
@@ -189,7 +189,7 @@ namespace Da7ee7_Academy.Controllers
             var user = await _context.Users.Include(u => u.File)
                 .FirstOrDefaultAsync(u => u.Id == User.GetUserId());
 
-            var file = await _photoRepository.SavePhotoAsync(photo, @"Uploads\Users_Picture");
+            var file = await _photoRepository.SavePhotoAsync(photo, @"wwwroot\Uploads\Users_Picture");
 
             var oldFile = user.File;
 

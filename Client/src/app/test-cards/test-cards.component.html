@@ -1,0 +1,22 @@
+<div class="h-100">
+    <app-navbar></app-navbar>
+    <div class="container">
+        <h2 class="text-center mt-5" *ngIf="cards.length !== 0">قائمة ارقام البطاقات لتسجيل ب اي دورة</h2>
+        <div class="content d-flex justify-content-center mt-5 text-center">
+            <ul class="list-group">
+                <li *ngFor="let card of cards" class="list-group-item">
+                    {{card}}
+                </li>
+                <ng-container *ngIf="cards.length === 0">
+                    <p class="lead">نعتذر لا يوجد بطاقات متاحة حاليا</p>
+                </ng-container>
+            </ul>
+        </div>
+    </div>
+    <button *ngIf="(accountService.loadedUser | async)?.role === 'Admin'"
+            (click)="generateCards()"
+            class="btn add-btn" 
+            style="background-color: #fb513e; color: #fff;">
+            <i class="fa fa-plus"></i>
+    </button>
+</div>

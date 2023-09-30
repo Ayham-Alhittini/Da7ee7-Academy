@@ -42,6 +42,7 @@ import { MyCoursesComponent } from './courses-view/my-courses/my-courses.compone
 import { SettingsComponent } from './settings/settings.component';
 import { PersonalInformationComponent } from './settings/personal-information/personal-information.component';
 import { PrivacyComponent } from './settings/privacy/privacy.component';
+import { TestCardsComponent } from './test-cards/test-cards.component';
 
 @NgModule({
   declarations: [
@@ -78,7 +79,8 @@ import { PrivacyComponent } from './settings/privacy/privacy.component';
     MyCoursesComponent,
     SettingsComponent,
     PersonalInformationComponent,
-    PrivacyComponent
+    PrivacyComponent,
+    TestCardsComponent
   ],
   imports: [
     BrowserModule,

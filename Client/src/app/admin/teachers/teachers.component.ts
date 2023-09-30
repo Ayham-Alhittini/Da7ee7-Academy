@@ -3,6 +3,7 @@ import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { ToastrService } from 'ngx-toastr';
 import { AccountService } from 'src/app/services/account.service';
 import { AdminService } from 'src/app/services/admin.service';
+import { StudentService } from 'src/app/services/student.service';
 
 @Component({
   selector: 'app-teachers',
@@ -22,7 +23,8 @@ export class TeachersComponent implements OnInit {
   constructor(private fb: FormBuilder, 
     private toastr: ToastrService, 
     private accountService: AccountService, 
-    private adminService: AdminService){}
+    private adminService: AdminService, 
+    public studentService: StudentService){}
 
   fileValue = null;
 
@@ -34,7 +36,6 @@ export class TeachersComponent implements OnInit {
   loadCourses() {
     this.adminService.getTeachers().subscribe(result => {
       this.teachers = result;
-      console.log(this.teachers);
     });
   }
 

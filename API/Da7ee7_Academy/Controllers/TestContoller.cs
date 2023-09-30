@@ -19,6 +19,14 @@ namespace Da7ee7_Academy.Controllers
         [HttpGet]
         public IActionResult Test()
         {
+            if (!_env.IsDevelopment())
+            {
+                return Ok(new
+                {
+                    Message = "Sorry this endpoint only accessable in development mode"
+                });
+            }
+
             string referrer = Request.Headers["Referer"].ToString();
 
             if (!referrer.StartsWith(_env.GetUrlRoot()))

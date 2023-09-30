@@ -200,7 +200,6 @@ D:\Da7ee7_Academy\Da7ee7_Academy\obj\Debug\net6.0\refint\Da7ee7_Academy.dll
 D:\Da7ee7_Academy\Da7ee7_Academy\obj\Debug\net6.0\Da7ee7_Academy.pdb
 D:\Da7ee7_Academy\Da7ee7_Academy\obj\Debug\net6.0\Da7ee7_Academy.genruntimeconfig.cache
 D:\Da7ee7_Academy\Da7ee7_Academy\obj\Debug\net6.0\ref\Da7ee7_Academy.dll
-D:\Da7ee7_Academy\API\Da7ee7_Academy\bin\Debug\net6.0\appsettings.Development.json
 D:\Da7ee7_Academy\API\Da7ee7_Academy\bin\Debug\net6.0\appsettings.json
 D:\Da7ee7_Academy\API\Da7ee7_Academy\bin\Debug\net6.0\Da7ee7_Academy.exe
 D:\Da7ee7_Academy\API\Da7ee7_Academy\bin\Debug\net6.0\Da7ee7_Academy.deps.json
@@ -400,3 +399,4 @@ D:\Da7ee7_Academy\API\obj\Debug\net6.0\refint\Da7ee7_Academy.dll
 D:\Da7ee7_Academy\API\obj\Debug\net6.0\Da7ee7_Academy.pdb
 D:\Da7ee7_Academy\API\obj\Debug\net6.0\Da7ee7_Academy.genruntimeconfig.cache
 D:\Da7ee7_Academy\API\obj\Debug\net6.0\ref\Da7ee7_Academy.dll
+D:\Da7ee7_Academy\API\Da7ee7_Academy\bin\Debug\net6.0\Da7ee7_Academy.staticwebassets.runtime.json

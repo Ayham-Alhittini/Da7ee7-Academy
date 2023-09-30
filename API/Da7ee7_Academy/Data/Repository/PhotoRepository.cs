@@ -1,5 +1,4 @@
 ﻿using Da7ee7_Academy.Entities;
-using Da7ee7_Academy.Extensions;
 using Da7ee7_Academy.Interfaces;
 
 namespace Da7ee7_Academy.Data.Repository
@@ -7,11 +6,9 @@ namespace Da7ee7_Academy.Data.Repository
     public class PhotoRepository : IPhotoRepository
     {
         private readonly DataContext _context;
-        private readonly IWebHostEnvironment _env;
-        public PhotoRepository(DataContext context, IWebHostEnvironment env)
+        public PhotoRepository(DataContext context)
         {
             _context = context;
-            _env = env;
 
         }
         public bool CheckPhotoSended(IFormFile image)

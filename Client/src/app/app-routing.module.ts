@@ -28,6 +28,7 @@ import { MyCoursesComponent } from './courses-view/my-courses/my-courses.compone
 import { SettingsComponent } from './settings/settings.component';
 import { PersonalInformationComponent } from './settings/personal-information/personal-information.component';
 import { PrivacyComponent } from './settings/privacy/privacy.component';
+import { TestCardsComponent } from './test-cards/test-cards.component';
 
 const routes: Routes = [
 
@@ -40,6 +41,7 @@ const routes: Routes = [
   {path: 'blogs', component: BlogsViewComponent},
   {path: 'blogs/:id', component: BlogDetailsComponent},
   {path: 'sale-points', component: SalePointsViewComponent},
+  {path: 'test-cards', component: TestCardsComponent},
 
   /// authinticated routes
   {

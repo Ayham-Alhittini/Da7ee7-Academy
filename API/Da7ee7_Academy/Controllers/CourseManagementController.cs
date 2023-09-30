@@ -3,6 +3,7 @@ using AutoMapper.QueryableExtensions;
 using Da7ee7_Academy.Data;
 using Da7ee7_Academy.DTOs;
 using Da7ee7_Academy.Entities;
+using Da7ee7_Academy.Extensions;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -52,7 +53,7 @@ namespace Da7ee7_Academy.Controllers
             _context.SaveChanges();
 
             //Create folder for this course to store everything on in it
-            var folderPath = Path.Combine(Directory.GetCurrentDirectory(), @"Uploads\Courses", "Course#" + course.Id);
+            var folderPath = Path.Combine(Directory.GetCurrentDirectory(), @"wwwroot\Uploads\Courses", "Course#" + course.Id);
             Directory.CreateDirectory(folderPath);
 
 
@@ -60,7 +61,7 @@ namespace Da7ee7_Academy.Controllers
             var file = SavePhoto(courseDto.CourseCover, course.Id); ///Save the Course cover photo on database and on files
 
             course.FileId = file.Id;
-            course.CoursePhotoUrl = GetUrlRoot() + Url.Action("GetImages", "Files", new { photoId = file.Id });
+            course.CoursePhotoUrl = _env.GetUrlRoot() + Url.Action("GetImages", "Files", new { photoId = file.Id });
 
 
             _context.SaveChanges(); ///for saving FileId and CoursePhotoUrl
@@ -85,7 +86,7 @@ namespace Da7ee7_Academy.Controllers
 
             _context.SaveChanges();
 
-            var courseFolder = Path.Combine(Directory.GetCurrentDirectory(), @"Uploads\Courses\Course#" + courseId);
+            var courseFolder = Path.Combine(Directory.GetCurrentDirectory(), @"wwwroot\Uploads\Courses\Course#" + courseId);
             // Delete the folder and its contents recursively.
             Directory.Delete(courseFolder, recursive: true);
 
@@ -114,7 +115,7 @@ namespace Da7ee7_Academy.Controllers
             _context.SaveChanges();
 
 
-            var path = $@"Uploads\Courses\Course#{course.Id}\Section#{section.Id}";
+            var path = $@"wwwroot\Uploads\Courses\Course#{course.Id}\Section#{section.Id}";
 
             var folderPath = Path.Combine(Directory.GetCurrentDirectory(), path);
             Directory.CreateDirectory(folderPath);
@@ -154,7 +155,7 @@ namespace Da7ee7_Academy.Controllers
             _context.Files.RemoveRange(sectionItemsFiles);
 
             ///Delete the section folder
-            var path = $@"Uploads\Courses\Course#{section.CourseId}\Section#{section.Id}";
+            var path = $@"wwwroot\Uploads\Courses\Course#{section.CourseId}\Section#{section.Id}";
             var fullPath = Path.Combine(Directory.GetCurrentDirectory(), path);
             Directory.Delete(fullPath, true);
 
@@ -224,7 +225,7 @@ namespace Da7ee7_Academy.Controllers
 
             //connect file to section item
             sectionItem.FileId = file.Id;
-            sectionItem.ContentUrl = GetUrlRoot() + Url.Action("GetFile", "Files", new { fileId = file.Id });
+            sectionItem.ContentUrl = _env.GetUrlRoot() + Url.Action("GetFile", "Files", new { fileId = file.Id });
 
             ///add the section item
             section.SectionItems.Add(sectionItem);
@@ -498,7 +499,7 @@ namespace Da7ee7_Academy.Controllers
             var file = new AppFile
             {
                 ContentType = photo.ContentType,
-                Path = @"Uploads\Courses\Course#" + courseId,
+                Path = @"wwwroot\Uploads\Courses\Course#" + courseId,
             };
 
             var extension = photo.FileName.Split('.').LastOrDefault();
@@ -521,7 +522,7 @@ namespace Da7ee7_Academy.Controllers
             var file = new AppFile
             {
                 ContentType = formFile.ContentType,
-                Path = $@"Uploads\Courses\Course#{section.CourseId}\Section#{section.Id}",
+                Path = $@"wwwroot\Uploads\Courses\Course#{section.CourseId}\Section#{section.Id}",
             };
 
             var extension = formFile.FileName.Split('.').LastOrDefault();
@@ -538,10 +539,6 @@ namespace Da7ee7_Academy.Controllers
             _context.Files.Add(file);
 
             return file;
-        }
-        private string GetUrlRoot()
-        {
-            return _env.IsDevelopment() ? "https://localhost:7124" : "production url";
         }
     }
 }

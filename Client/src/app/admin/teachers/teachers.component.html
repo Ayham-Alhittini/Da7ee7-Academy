@@ -85,7 +85,7 @@
             <div class="mb-3">
                 <label>Major</label>
                 <select class="form-select" formControlName="major">
-                    <option value="رياضيات">رياضيات</option>
+                    <option *ngFor="let subject of (studentService.getSubjects())" value="{{subject}}">{{subject}}</option>
                 </select>
             </div>
 

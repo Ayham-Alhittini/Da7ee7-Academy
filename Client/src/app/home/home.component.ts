@@ -16,10 +16,13 @@ export class HomeComponent implements OnInit{
 
   constructor(private userService: UserService) {}
 
+  alertShown = false;
   ngOnInit(): void {
+    this.alertShown = this.userService.adminAccountAlrearShown;
     this.userService.getHome().subscribe(result => {
       this.homeData = result;
-    })
+      this.userService.adminAccountAlrearShown = true;
+    });
   }
 
   getTeacher(teacherId: string) : Member{

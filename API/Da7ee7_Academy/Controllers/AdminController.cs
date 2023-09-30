@@ -103,7 +103,7 @@ namespace Da7ee7_Academy.Controllers
                 Content = NewBlogDto.Content,
             };
 
-            var file = _photoRepository.SavePhoto(NewBlogDto.BlogPhoto, @"Uploads\Blogs_Picture");
+            var file = _photoRepository.SavePhoto(NewBlogDto.BlogPhoto, @"wwwroot\Uploads\Blogs_Picture");
 
             blog.AppFileId = file.Id;
 

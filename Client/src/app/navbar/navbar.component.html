@@ -25,6 +25,9 @@
         <li class="nav-item me-4">
           <a class="nav-link router" routerLink="/sale-points" routerLinkActive="active-page" [routerLinkActiveOptions]="{ exact: true }">نقاط البيع</a>
         </li>
+        <li class="nav-item me-4">
+          <a class="nav-link router" routerLink="/test-cards" routerLinkActive="active-page" [routerLinkActiveOptions]="{ exact: true }">بطاقات للتجربة</a>
+        </li>
       </ul>
       
       <ul class="navbar-nav me-auto auth-nav" *ngIf="(accountService.loadedUser | async)">
@@ -97,6 +100,11 @@
   <a (click)="navExpanded = false" routerLink="/sale-points">
     <i class="fa fa-map-marker ms-2"></i>
     <span>نقاط البيع</span>
+  </a>
+
+  <a (click)="navExpanded = false" routerLink="/test-cards">
+    <i class="fa-solid fa-flask-vial ms-2"></i>
+    <span>بطاقات للتجربة</span>
   </a>
 
 </div>

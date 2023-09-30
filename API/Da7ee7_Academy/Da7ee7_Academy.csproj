@@ -7,10 +7,10 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Compile Remove="Uploads\Courses\Course#3\**" />
-    <Content Remove="Uploads\Courses\Course#3\**" />
-    <EmbeddedResource Remove="Uploads\Courses\Course#3\**" />
-    <None Remove="Uploads\Courses\Course#3\**" />
+    <Compile Remove="wwwroot\Uploads\Courses\Course#3\**" />
+    <Content Remove="wwwroot\Uploads\Courses\Course#3\**" />
+    <EmbeddedResource Remove="wwwroot\Uploads\Courses\Course#3\**" />
+    <None Remove="wwwroot\Uploads\Courses\Course#3\**" />
   </ItemGroup>
 
   <ItemGroup>
@@ -29,8 +29,9 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Uploads\Courses\" />
-    <Folder Include="Uploads\Blogs_Picture\" />
+    <Folder Include="wwwroot\Uploads\Blogs_Picture\" />
+    <Folder Include="wwwroot\Uploads\Courses\" />
+    <Folder Include="wwwroot\Uploads\Users_Picture\" />
   </ItemGroup>
 
 </Project>

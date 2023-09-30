@@ -18,6 +18,16 @@ namespace Da7ee7_Academy.Controllers
             _mapper = mapper;
         }
 
+        [HttpGet("test-cards")]
+        public async Task<ActionResult> TestCards()
+        {
+            var cards = await _context.Cards.Where(c => c.StudentId == null)
+                .Select(c => c.CardNumber)
+                .ToListAsync();
+            return Ok(cards);
+        }
+
+
         [HttpGet("get-courses/{major}")]
         public async Task<ActionResult> GetCourses(string major)
         {

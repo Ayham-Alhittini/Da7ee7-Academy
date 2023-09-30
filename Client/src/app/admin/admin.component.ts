@@ -13,8 +13,9 @@ export class AdminComponent {
       next: (event: any) => {
         if(event instanceof NavigationEnd){
           const url = event.url;
-          // console.log(url);
-          this.activeChild = this.getChild(url);
+          if (url) {
+            this.activeChild = this.getChild(url);
+          }
         }
       }
     })

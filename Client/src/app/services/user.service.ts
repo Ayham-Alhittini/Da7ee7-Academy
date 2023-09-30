@@ -11,11 +11,17 @@ import { Blog } from '../models/Blog';
 })
 export class UserService {
 
+  adminAccountAlrearShown = false;
+
   private baseUrl = environment.apiBaseUrl + 'user';
   constructor(private http: HttpClient) { }
 
   getTeachers(){
     return this.http.get<Teacher[]>(this.baseUrl + '/get-teachers');
+  }
+
+  getTestCards() {
+    return this.http.get<string[]>(this.baseUrl + '/test-cards');
   }
 
   getSingleTeacher(id: string) {
