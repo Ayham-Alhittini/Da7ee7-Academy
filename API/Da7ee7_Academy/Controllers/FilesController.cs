@@ -47,7 +47,7 @@ namespace Da7ee7_Academy.Controllers
         {
             string referrer = Request.Headers["Referer"].ToString();
 
-            if (!referrer.StartsWith("https://localhost:4200/") && !referrer.StartsWith(_env.GetUrlRoot()))
+            if (!referrer.StartsWith("http://localhost:4200/") && !referrer.StartsWith(_env.GetUrlRoot()))
             {
                 return Ok(new
                 {

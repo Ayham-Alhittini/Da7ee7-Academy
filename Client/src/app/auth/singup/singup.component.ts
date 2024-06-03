@@ -42,13 +42,18 @@ export class SingupComponent  implements OnInit {
     if (this.singupForm.invalid) return;
     
     this.loading = true;
-    this.accountService.studentRegister(this.singupForm.value).subscribe(() => {
-      this.toaster.success("أدخل الى الرابط المرسل الى بريدك لاثبات ملكية بريدك", "تأكيد البريد الالكتروتي", {
-        timeOut: 6000
-      });
-
-      this.router.navigateByUrl("/login");
+    this.accountService.studentRegister(this.singupForm.value).subscribe({
+      next: () => {
+        this.toaster.success("أدخل الى الرابط المرسل الى بريدك لاثبات ملكية بريدك", "تأكيد البريد الالكتروتي", {
+          timeOut: 6000
+        });
+        this.loading = false;
+  
+        this.router.navigateByUrl("/login");
+      },
+      error: () => {
+        this.loading = false;
+      }
     });
-    this.loading = false;
   }
 }
